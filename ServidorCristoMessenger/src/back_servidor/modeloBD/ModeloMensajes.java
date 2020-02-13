@@ -119,7 +119,10 @@ public class ModeloMensajes extends BDConnector{
 
     public int get_messages_fecha(String db, String table,String usuario, String amigo, String fecha) throws SQLException {
         
-        this.setQuery("SELECT * FROM "+ get_dbname() + "." + getTabladb()+" WHERE (((id_user_orig ='"+usuario+"'and id_user_dest = '"+amigo+"')or (id_user_dest ='"+usuario+"' and id_user_orig ='"+amigo+"'))  and datetime like '"+fecha+"%');" );
+        String[] parts = fecha.split(" ");
+        String solo_fecha = parts[0];
+        
+        this.setQuery("SELECT * FROM "+ get_dbname() + "." + getTabladb()+" WHERE (((id_user_orig ='"+usuario+"'and id_user_dest = '"+amigo+"')or (id_user_dest ='"+usuario+"' and id_user_orig ='"+amigo+"'))  and datetime like '"+solo_fecha+"%');" );
 
         this.conectar_bd();
         int num = 0;

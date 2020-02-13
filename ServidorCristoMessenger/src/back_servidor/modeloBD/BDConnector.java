@@ -34,12 +34,12 @@ public class BDConnector {
         //Por defecto se va a conectar a MySQL
         //System.out.println("DEBUG: Constructor bdconnector");
         
-        user = "clasedam2";
-        password = "root";
+        user = /*"clasedam2"*/"root";
+        password = /*"root"*/ "newroot";
         sgbd = "mysql";
-        ip = "clasedam2.ddns.net";
+        ip = /*"clasedam2.ddns.net"*/ "localhost";
         puerto = "3306";
-        dbname = "cristomessenger";
+        dbname = /*"cristomessenger"*/"cristomessengerlocal";
         stmt = null;       
         rs = null; 
         

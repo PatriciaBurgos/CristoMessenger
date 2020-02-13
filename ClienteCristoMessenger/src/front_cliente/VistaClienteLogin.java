@@ -69,7 +69,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
             }
         });
 
-        password.setText("jaime");
+        password.setText("1234");
 
         jCheckBox1.setText("Remember my user");
 
@@ -91,7 +91,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
 
         jLabel2.setText("PUERTO:");
 
-        textIP.setText("83.50.220.134");
+        textIP.setText("83.50.219.174");
         textIP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 textIPActionPerformed(evt);

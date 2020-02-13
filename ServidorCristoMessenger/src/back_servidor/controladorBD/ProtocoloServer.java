@@ -73,6 +73,8 @@ public class ProtocoloServer {
 
                 //Salida                
                 theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#LOGIN_CORRECT#"+usuario+"#FRIENDS#"+array_amigos.size()+"#";
+                
+                //TODO ME ESTA MANDANDO UNA # al final
                 for(int i = 0; i<array_amigos.size(); i++){
                     if(i==array_amigos.size()){
                         theOutput += array_amigos.get(i);
@@ -136,7 +138,7 @@ public class ProtocoloServer {
         }   
         
         //CAMBIARR POR EL NUMERO DE LA FECHA
-        hebra.num_men_fecha=num_mensajes_totales;
+        hebra.num_men_fecha=num_mensajes_fecha;
         return theOutput;
         
         

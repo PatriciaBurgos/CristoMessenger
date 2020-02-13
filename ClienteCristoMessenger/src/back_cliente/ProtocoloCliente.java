@@ -18,8 +18,8 @@ import java.util.Calendar;
  */
 public class ProtocoloCliente {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final SimpleDateFormat sdf_fecha = new SimpleDateFormat("yyyy-MM-dd");
-    
+    //Timestamp auxDate = new Timestamp(System.currentTimeMillis());
+    //String auxDate1 = null;
         
     public String procesarEntradaLogin(String usuario, String contraseña) {
         String theOutput = null;
@@ -79,41 +79,40 @@ public class ProtocoloCliente {
         return nombre_amigos;
     }
     
-    public String procesarPedirConversacion(String user,String user_friend){
-        String theOutput = null;
-        
+    public String procesarPedirConversacion(String user,String user_friend, String auxDate1){
+        String theOutput = "";
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+       
         int empi = user_friend.indexOf(" ---");
         String amigo = user_friend.substring(0, empi);
         
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#MSGS#"+user+"#"+amigo+"#"+sdf_fecha.format(timestamp);
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#MSGS#"+user+"#"+amigo+"#"+auxDate1;
+               
         
         return theOutput;
     }
     
-    public String procesarConversacion_Numero(String salida_server, int num_men, ConexionClienteconServer conexion){
-        String theOutput=null;
-        
+    public void procesarConversacion_Numero(String salida_server, int num_men_totales,int num_men_dia, ConexionClienteconServer conexion){       
         int comprobacion_validez = salida_server.indexOf("#SERVER#BAD_MSGPKG");        
         if(comprobacion_validez ==-1){ //Mensaje correcto
-//            int num_mensajes_empieza = salida_server.lastIndexOf("#");
-//            num_men = Integer.valueOf(salida_server.substring(num_mensajes_empieza+1));
-//            
-            String[] parts = salida_server.split("#");        
-            num_men = Integer.valueOf(parts[6]); //Poner el 7 que son los mensajes en una fecha
-        
-            conexion.setNum_men(num_men);
             
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            if(num_men !=0){
-                theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#MSGS#OK_SEND!";
-            }else{//All received
-                theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#MSGS#ALL_RECEIVED";
-            }
-                        
+            String[] parts = salida_server.split("#");        
+            num_men_totales = Integer.valueOf(parts[6]); 
+            num_men_dia = Integer.valueOf(parts[7]); //Poner el 7 que son los mensajes en una fecha
+        
+            conexion.setNum_men_totales(num_men_totales);
+            conexion.setNum_men_dia(num_men_dia);                        
         }else{
-            //Mensaje incorrecto
+            System.out.println("Mal paquete");
         }
+    }
+    
+    public String procesarConversacion_ok_send (){
+        String theOutput = null;
+        
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#MSGS#OK_SEND!";
+        
         return theOutput;
     }
     
@@ -150,7 +149,7 @@ public class ProtocoloCliente {
         }
     }
     
-    public String procesarSalidaConversacion_AllReceived(){
+    public String procesarConversacion_all_received(){
         String theOutput = null;
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
