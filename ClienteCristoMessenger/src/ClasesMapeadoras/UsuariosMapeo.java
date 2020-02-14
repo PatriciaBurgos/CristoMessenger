@@ -94,4 +94,13 @@ public class UsuariosMapeo {
     public void setState(int state) {
         this.state = state;
     }
+
+    @Override
+    public String toString() {
+        return "UsuariosMapeo{" + "id_user=" + id_user + ", name=" + name + ", surname1=" + surname1 + ", surname2=" + surname2 + "}";
+    }
+
+
+
+
 }

@@ -317,34 +317,16 @@ public class VistaClienteChats extends javax.swing.JFrame {
     public void get_messages_friend(String user_dest, int pos) throws IOException {
         
         //Tengo que cambiar lo de los amigos_del_usuario_mensajes
-        this.conexionCliente.conectar_con_server_mensajes(user_dest,amigos_del_usuario_mensajes, pos);        
+        this.conexionCliente.conectar_con_server_mensajes(user_dest,amigos_del_usuario_mensajes, pos);
       
         this.text_area.setText("");
         for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){
             this.text_area.setText(text_area.getText()+amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText()+"\n");            
         }
         
+        this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
 
         
-        
-//        for (int i =0; i<mensajes.mensajes_array.size(); i++) {
-//        //ARREGLAR VISTAAA    
-//            this.text_area.append(this.label_usuario_activo.getText()+": "+amigos_del_usuario_mensajes.mensajes_array.get(i).getId_user_orig()+ ": " +amigos_del_usuario_mensajes.mensajes_array.get(i).getText()+"\n");            
-//        }
-        
-        
-        
-        
-        
-        
-//        mess_con.get_messages(mess, user_orig, user_dest);
-//        
-//        for (int i =0; i<mess.size(); i++) {
-//            
-////            if (mess.get(i).getId_user_orig() == user_orig){
-//////                this.text_area.append(this.label_usuario_activo.getText()+": "+texto+"\n");
-////            }
-//        }
     }
     
     

@@ -9,6 +9,7 @@ import back_servidor.controladorBD.ControladorAmigos;
 import back_servidor.controladorBD.ControladorUsuario;
 import back_servidor.modeloBD.MensajesMapeo;
 import back_servidor.modeloBD.ModeloAmigos;
+import back_servidor.modeloBD.UsuariosMapeo;
 import front_servidor.VistaServer;
 import java.net.*;
 import java.io.*;
@@ -76,8 +77,8 @@ public class ProtocoloServer {
                 
                 //TODO ME ESTA MANDANDO UNA # al final
                 for(int i = 0; i<array_amigos.size(); i++){
-                    if(i==array_amigos.size()){
-                        theOutput += array_amigos.get(i);
+                    if(i==array_amigos.size()-1){
+                        theOutput += array_amigos.get(i) + "#";
                         //Ahora me falta conectado o no conectado
                         if(hebra.controladorUsuario.comprobar_conexion(array_amigos.get(i).toString())){ //1 -- Conecatdo
                             theOutput += "CONNECTED";
@@ -109,7 +110,6 @@ public class ProtocoloServer {
         int num_mensajes_totales=0, num_mensajes_fecha=0;
         String fecha_mensajes;     
         
-        
         //1-Compruebo que contiene el MSGS
         if(entrada.contains("#MSGS#")){
             String[] parts = entrada.split("#");
@@ -137,38 +137,8 @@ public class ProtocoloServer {
             theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#BAD_MSGPKG";
         }   
         
-        //CAMBIARR POR EL NUMERO DE LA FECHA
         hebra.num_men_fecha=num_mensajes_fecha;
-        return theOutput;
-        
-        
-        
-//        //1-Descrifrar los dos usuarios
-//        int empieza_usuario = entrada.indexOf("#MSGS#");
-//        
-//        if(empieza_usuario!=-1){
-//            empieza_usuario+=6;
-//            int ultima_almohadilla = entrada.lastIndexOf("#");
-//            usuario = entrada.substring(empieza_usuario, ultima_almohadilla);
-//            amigo = entrada.substring(ultima_almohadilla+1);
-//        
-//            hebra.setUsuario(usuario);
-//            hebra.setAmigo(amigo);
-//            
-//            //2-Recoger el numero de mensajes totales
-//            num_mensajes = hebra.controladorMensajes.get_messages_numero(usuario, amigo);
-//            
-//            //3-Hacer la cadena
-//            Timestamp timestamp = new Timestamp(System.currentTimeMillis());    
-//            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#MSGS#"+usuario+"#"+amigo+"#"+num_mensajes;
-//            
-//        }else{
-//            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#BAD_MSGPKG";
-//        }   
-//        
-//        hebra.num_men_fecha=num_mensajes;
-//        return theOutput;
+        return theOutput;        
     }
 
     public String procesarEntradaMensajesSend(String entrada, MultiServerThread2 hebra, String usuario, String amigo, ArrayList mensajes) throws SQLException{
@@ -182,5 +152,34 @@ public class ProtocoloServer {
                 
         return theOutput;  
     }
+    
+    public String procesarEntradaObtenerDatos (String entrada, MultiServerThread2 hebra){
+        String theOutput = null;
+        boolean check = false;
+        
+        //1)Sacar el usuario de la cadena de entrada
+        int empieza_user = entrada.lastIndexOf("#");
+        String usuario = entrada.substring(empieza_user+1);
+        
+        //2)Comprobacion usuario logado
+        check = hebra.controladorUsuario.check_user(usuario);
+       
+        //3)Si esta logeado, me traigo datos
+        if(check == true){
+            UsuariosMapeo usuario_datos = new UsuariosMapeo();
+            usuario_datos.setId_user(usuario);
+            hebra.controladorUsuario.get_data_user(usuario_datos);
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#ALLDATA_USER#"+usuario_datos.getId_user()+""
+                    + "#"+usuario_datos.getName()+"#"+usuario_datos.getSurname1()+"#"+usuario_datos.getSurname2();
+        }else{
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#BAD_DATA";
+        }
+        
+        //4)Mando la cadena
+        return theOutput;
+    }
+    
 }
 

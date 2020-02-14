@@ -8,6 +8,7 @@ package back_cliente;
 import ClasesMapeadoras.AmigosMapeo;
 import ClasesMapeadoras.MensajesMapeo;
 import ClasesMapeadoras.UsuariosMapeo;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -17,12 +18,12 @@ import java.util.ArrayList;
 public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
     public ArrayList <MensajesMapeo> mensajes_array;
     int num_amigos;
+    String ultima_fecha_buscada;
+    int num_men_recibidos;
     
     public AmigosDeUnUsuario_Mensajes(){
         mensajes_array=new ArrayList();
     }
-    
-    
 
     public int getNum_amigos() {
         return num_amigos;
@@ -32,6 +33,21 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
         this.num_amigos = num_amigos;
     }
 
-   
-       
+    public String getUltima_fecha_buscada() {
+        return ultima_fecha_buscada;
+    }
+
+    public void setUltima_fecha_buscada(String ultima_fecha_buscada) {
+        this.ultima_fecha_buscada = ultima_fecha_buscada;
+    }
+
+    public int getNum_men_recibidos() {
+        return num_men_recibidos;
+    }
+
+    public void setNum_men_recibidos(int num_men_recibidos) {
+        this.num_men_recibidos = num_men_recibidos;
+    }
+
+    
 }

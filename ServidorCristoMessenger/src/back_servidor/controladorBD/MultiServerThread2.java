@@ -84,12 +84,17 @@ public class MultiServerThread2 extends Thread {
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "CLIENT TO SERVER: " +entrada_cliente+ "\n");
 
             //Compruebo que esta bien lo primero del protocolo
-            int comprobacion_entrada_cliente = entrada_cliente.indexOf("PROTOCOLCRISTOMESSENGER1.0");
-            if(comprobacion_entrada_cliente != -1){
+//////            int comprobacion_entrada_cliente = entrada_cliente.indexOf("PROTOCOLCRISTOMESSENGER1.0");
+//////            if(comprobacion_entrada_cliente != -1){
+                
+            if(entrada_cliente.contains("PROTOCOLCRISTOMESSENGER1.0")){
+                
                 
                 //COMPROBACION LOGIN
-                int comprobacion_entrada_cliente_login = entrada_cliente.indexOf("#CLIENT#LOGIN#");
-                if(comprobacion_entrada_cliente_login != -1){
+////////                int comprobacion_entrada_cliente_login = entrada_cliente.indexOf("#CLIENT#LOGIN#");
+////////                if(comprobacion_entrada_cliente_login != -1){
+
+                if(entrada_cliente.contains("#CLIENT#LOGIN#")){
                     try {
                         this.hebra_login();
                     } catch (SQLException ex) {
@@ -97,9 +102,9 @@ public class MultiServerThread2 extends Thread {
                     }
                 }
                 
-                //COMPROBACION MENSAJES
-                int comprobacion_entrada_cliente_mensajes = entrada_cliente.indexOf("#MSGS#");   
                 
+                //COMPROBACION LEER MENSAJES
+                int comprobacion_entrada_cliente_mensajes = entrada_cliente.indexOf("#MSGS#");             
                 if(comprobacion_entrada_cliente_mensajes != -1){
                     //COMPROBACION CADENA DE CLIENTE
                     int comprobacion_entrada_cliente_mensajes_send = entrada_cliente.indexOf("OK_SEND!");
@@ -121,12 +126,35 @@ public class MultiServerThread2 extends Thread {
                         } catch (SQLException ex) {
                             Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        
                         //3 CADENA CLIENTE ALL RECEIVED
                     }else if(comprobacion_entrada_cliente_mensajes_received != -1){ 
                         System.out.println("SERVER: El cliente ha recibido todos los mensajes");
                         VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: El cliente ha recibido todos los mensajes" + "\n");
                     }                    
                 }
+                
+                
+                //COMPROBACION DATOS USUARIO
+                if(this.entrada_cliente.contains("#ALLDATA_USER#")){
+                    //1- Llamo al protocolo para que me descibre la cadena y 
+                    //1)Compruebe que es un usuario del sistema
+                    //2)Recolecte toda la informacion
+                    //3)Se mande por el socket
+                    this.salida_server = this.protocolo.procesarEntradaObtenerDatos(this.entrada_cliente,this);
+                    //2- Mando los datos o el error al usuario
+                    this.mandar_al_cliente_todos_los_datos_usuario(salida_server);                    
+                }
+               
+                
+                
+                
+                
+                
+                
+                
+                
+                
 
             //ERROR EN EL PRINCIPIO DE LA CADENA
             }else{
@@ -181,14 +209,13 @@ public class MultiServerThread2 extends Thread {
         }
     }
     
+    public void mandar_al_cliente_todos_los_datos_usuario(String salida){
+        System.out.println("SERVER SALIDA PROTOCOLO: " +salida);
+        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida + "\n");
+        out.println(salida);  
+    }
     
-//    public void hebra_mensajes() throws SQLException{
-//        salida_server = protocolo.procesarEntradaMensajes(entrada_cliente, this);
-//        System.out.println("SERVER SALIDA PROTOCOLO: " +salida_server);
-//        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida_server + "\n");
-//        //PROGRAMAR ERROR MENSAJES
-//        out.println(salida_server);
-//    }
+    
     
     public void desconectar (){
         System.out.println("SERVER: DESCONECTO HEBRA");

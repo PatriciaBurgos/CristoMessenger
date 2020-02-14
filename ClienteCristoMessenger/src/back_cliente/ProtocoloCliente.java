@@ -6,6 +6,7 @@
 package back_cliente;
 
 import ClasesMapeadoras.MensajesMapeo;
+import ClasesMapeadoras.UsuariosMapeo;
 import front_cliente.VistaClienteChats;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -157,4 +158,44 @@ public class ProtocoloCliente {
         return theOutput;        
     }
     
+    public String procesarTodosLosDatos_Usuario(String nom_user){
+        String theOutput = null;
+        String usuario = nom_user;
+        
+        if(nom_user.contains(" --- ")){
+            int empi = nom_user.indexOf(" ---");
+            usuario = nom_user.substring(0, empi);
+        }
+        
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#ALLDATA_USER#"+usuario;
+        
+        return theOutput;
+    }
+    
+    public void procesarDatosUsuario(String salida_server){
+        
+        int comprobacion = salida_server.indexOf("#ALLDATA_USER#");
+    
+        String cadena_mensajes = salida_server.substring(comprobacion+1);
+            
+            String[] parts = cadena_mensajes.split("#");
+            
+            UsuariosMapeo usuario = new UsuariosMapeo();
+            
+            String login = parts[1];
+            usuario.setId_user(login);
+            
+            String nombre = parts[2];
+            usuario.setName(nombre);
+            
+            String apellido1 =parts[3];
+            usuario.setSurname1(apellido1);
+            
+            String apellido2 =parts[4];
+            usuario.setSurname2(apellido2);
+
+            System.out.println(usuario.toString());
+            
+    }
 }

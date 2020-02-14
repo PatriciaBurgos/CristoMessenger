@@ -53,46 +53,14 @@ public class ModeloUsuario extends BDConnector{
     
     //*****CLASS METHODS*****//
     
-    //TODO gets
-    
-//    public void query_all_users () {
-//        setQuery ("SELECT * FROM " + get_dbname() + "." + getTabladb()); 
-//    }
-    
-    
-    public void get_all_users_model (String db, String table, ArrayList users) throws SQLException {
-       // System.out.println("DEBUG:Method get_all_users_model");
-//       
-//       this.query_all_users();
-//       
-//        try { 
-//            this.set_stmt(this.getConn().createStatement());
-//            this.set_rs(this.get_stmt().executeQuery(query));
-//            
-//            while (get_rs().next()) {
-//                String id_user = get_rs().getString("id_user");
-//                String name = get_rs().getString("name");
-//
-//                ModeloUsuario  user = new ModeloUsuario ();
-//                user.setId_user(id_user);
-//                user.setName(name);
-//                
-//                users.add (user);
-//                
-//            }
-//        } catch (SQLException e ) {
-//            System.out.println(e);
-//        } 
-//        finally {
-//            if (get_stmt() != null) { get_stmt().close(); }
-//        }
-    }    
-    
-            
-    public void get_all_users_login_model (String db, String table, ArrayList users, String usuario_login, String usuario_contrasenia) throws SQLException {
-       // System.out.println("DEBUG:Method get_all_users_model");
-      
+    public void query_search_user(String usuario_login){
         this.setQuery("SELECT * FROM "+get_dbname()+"."+getTabladb()+" WHERE id_user = '" + usuario_login+"';");
+    }
+       
+    
+    public boolean check_user_login (String db, String table, String usuario_login, String usuario_contrasenia, boolean check) throws SQLException {
+      
+        this.query_search_user(usuario_login);
         this.conectar_bd();
        
         try {
@@ -103,23 +71,9 @@ public class ModeloUsuario extends BDConnector{
             while (get_rs().next()) {
                 
                 String contras = get_rs().getString("password");
-                String nomb = get_rs().getString("name");
-                String sur1 = get_rs().getString("surname1");
-                String sur2 = get_rs().getString("surname2");
-                String foto = get_rs().getString("photo");
-                int estado = get_rs().getInt("state");
 
                 if (contras.equals(usuario_contrasenia)){
-                    UsuariosMapeo  user = new UsuariosMapeo ();
-                    user.setId_user(usuario_login);
-                    user.setPassword(usuario_contrasenia);
-                    user.setName(nomb);
-                    user.setPhoto(foto);
-                    user.setSurname1(sur1);
-                    user.setSurname2(sur2);
-                    user.setState(estado);
-
-                    users.add (user);
+                    check=true;
                 }
                 
             }
@@ -129,12 +83,37 @@ public class ModeloUsuario extends BDConnector{
         finally {
             if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
         }
-    }    
+        
+        return check;
+    }   
+    
+    public boolean check_user (String db, String table, String usuario_login,boolean check) throws SQLException {      
+       
+        this.query_search_user(usuario_login);
+        this.conectar_bd();
+       
+        try {
+            this.set_stmt(this.getConn().createStatement());
+            
+            this.set_rs(this.get_stmt().executeQuery(getQuery()));
+            
+            while (get_rs().next()) {
+                check=true;                
+            }
+        } catch (SQLException e ) {
+            System.out.println(e);
+        } 
+        finally {
+            if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
+        }
+        
+        return check;
+    }   
     
     public boolean get_conexion(String db, String table,String nom_usuario) throws SQLException{
         boolean check = false;
         
-        this.setQuery("SELECT * FROM "+get_dbname()+"."+getTabladb()+" WHERE id_user = '" + nom_usuario+"';");
+        this.query_search_user(nom_usuario);
         this.conectar_bd();
        
         try {
@@ -159,25 +138,30 @@ public class ModeloUsuario extends BDConnector{
     }
     
     
-    public void set_new_user_model (String db, String table, ModeloUsuario new_user) throws SQLException {
-        
-        
-//        try {
-//            System.out.println("DEBUG: INSERT (Mod)");
-//            this.set_stmt(this.getConn().createStatement());
-//            String insertar = ("INSERT INTO cristo_messenger.user VALUES ('"+new_user.getId_user()+"', '"+new_user.getName()+"', '"+new_user.getPassword()+"','"+new_user.getSurname1()+"','"+new_user.getSurname2()+"','"+new_user.getPhoto()+"','"+new_user.getState()+"');");
-//            System.out.println(insertar);
-//            this.stmt.executeUpdate(insertar);
-//            
-//            System.out.println("New user bd");
-//            
-//
-//        } catch (SQLException e ) {
-//            System.out.println(e);
-//        } 
-//        finally {
-//            if (get_stmt() != null) { get_stmt().close(); }
-//        }
+    public void get_data_user (String db, String table, UsuariosMapeo user_data) throws SQLException {
+        this.query_search_user(user_data.getId_user());
+        this.conectar_bd();
+       
+        try {
+            this.set_stmt(this.getConn().createStatement());
+            
+            this.set_rs(this.get_stmt().executeQuery(getQuery()));
+            
+            while (get_rs().next()) {                
+                String name = get_rs().getString ("name");
+                String surname1 = get_rs().getString ("surname1");
+                String surname2 = get_rs().getString ("surname2");
+                
+                user_data.setName(name);
+                user_data.setSurname1(surname1);
+                user_data.setSurname2(surname2); 
+            }
+        } catch (SQLException e ) {
+            System.out.println(e);
+        } 
+        finally {
+            if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
+        }
     }
     
 }

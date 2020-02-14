@@ -108,11 +108,14 @@ public class ConexionClienteconServer {
         //HACER DO WHILE POR SI EN UNA FECHA NO HAY MENSAJES PERO SI HAY EN LA CONVERSACION 
         
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        auxDate1 = sdf.format(timestamp);
+        if(array_amigos_mensajes.get(pos).ultima_fecha_buscada==null){
+            auxDate1 = sdf.format(timestamp);
+        }else{
+            auxDate1 = array_amigos_mensajes.get(pos).ultima_fecha_buscada;
+        }        
         
         do{
-            //1-Pido los mensajes en una fecha y se lo mando al server
-            
+            //1-Pido los mensajes en una fecha y se lo mando al server            
             this.pedir_conversaciones_server_fecha(usuario_dest);
 
             //2-Recivo del server el numero de mensajes totales de la conversacion y el numero de mensajes totales de un dia
@@ -128,9 +131,30 @@ public class ConexionClienteconServer {
                     //BORRAR ELSE
                 }
             }
-        }while(this.num_men_totales!=0 && this.num_men_dia==0);
+        }while(this.num_men_dia==0 && this.num_men_totales!=0 && array_amigos_mensajes.get(pos).getNum_men_recibidos() != this.num_men_totales);
+        
+        array_amigos_mensajes.get(pos).setUltima_fecha_buscada(auxDate1);
     
     }
+    
+    public void conectar_con_server_obtener_datos(String nom_user) throws IOException{
+        //1- Llamar al protocolo para hacer la cadena
+        fromUser = this.protocolo.procesarTodosLosDatos_Usuario(nom_user);
+        
+        //2- Enviar al server la cadena formada
+        this.pedir_al_server_datos_usuario();
+        
+        //3- El server nos devuelve la cadena con los datos del usuario y lo mandamos al protocolo
+        this.procesar_entrada_server_datos();
+        
+        //4- Guardamos en el array los datos(Es una opcion)
+        
+    }
+    
+    
+    
+    
+    
     
     public void pedir_conversaciones_server_fecha(String usuario_dest){
         
@@ -152,8 +176,7 @@ public class ConexionClienteconServer {
             
             num_men_totales=0;
             num_men_dia = 0;
-            
-            
+
             //Aqui solo saco los numeros de las conversaciones
             protocolo.procesarConversacion_Numero(fromServer, num_men_totales,num_men_dia, this);
         }
@@ -169,16 +192,17 @@ public class ConexionClienteconServer {
     }
     
     public void recibir_mensajes_un_dia(ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
-        array_amigos_mensajes.get(pos).mensajes_array.clear();
-
+       // array_amigos_mensajes.get(pos).mensajes_array.clear();
+        
         //Me traigo los mensajes de un usuario en una fecha
-        for(int i=0; i<this.num_men_totales; i++){
+        for(int i=0; i<this.num_men_dia; i++){
             //Si me envía algún mensaje
             if((fromServer = in.readLine()) != null){
                 System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
                 VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-                protocolo.procesarConversacion_Mensajes(fromServer, array_amigos_mensajes.get(pos).mensajes_array, num_men_totales);
+                protocolo.procesarConversacion_Mensajes(fromServer, array_amigos_mensajes.get(pos).mensajes_array, num_men_totales);   
             }
+            array_amigos_mensajes.get(pos).num_men_recibidos++;
         }    
     }
     
@@ -190,86 +214,25 @@ public class ConexionClienteconServer {
             out.println(fromUser); //Envia por el socket            
         }
     }
+        
+    public void pedir_al_server_datos_usuario(){
+        if (fromUser != null) {
+            System.out.println("CLIENT TO SERVER: " + fromUser);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+            out.println(fromUser); //Envia por el socket            
+        }
+    }
+    
+    public void procesar_entrada_server_datos() throws IOException{
+        if((fromServer = in.readLine()) != null){
+            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+            protocolo.procesarDatosUsuario(fromServer);   
+        }
+    }
+    
 }   
     
     
     
     
-//    public void conectar_con_server_mensajes(String usuario_dest,ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
-
-//        fromUser = protocolo.procesarPedirConversacion(this.usuario, usuario_dest);
-//         
-//        //Envio al server que quiero los mensajes de una fecha y con unos usuarios
-//        if (fromUser != null) {
-//            System.out.println("CLIENT TO SERVER: " + fromUser);
-//            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
-//
-//            out.println(fromUser); //Envia por el socket            
-//        }
-//        
-//        //Recivo mensaje del numero de mensajes y del numero de mensajes de el dia que ha indicado el server
-//        if((fromServer = in.readLine()) != null){
-//            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-//            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-//            
-//            num_men_totales=0;
-//            num_men_dia = 0;
-//            fromUser = protocolo.procesarConversacion_Numero(fromServer, num_men_totales,num_men_dia, this);
-//            
-//            if(num_men_totales !=0){
-//            
-//                if(num_men_dia != 0){ //Si el num de mensajes es != 0 entonces me van a llegar mensajes
-//                   //Compruebo lo que se le va a mandar al server de salida por parte del cliente 
-//                    int comprobacion_send = fromUser.indexOf("#CLIENT#MSGS#OK_SEND!");
-//                    int comprobacion_received = fromUser.indexOf("#CLIENT#MSGS#ALL_RECEIVED");
-//
-//                    if(comprobacion_send != 0 || comprobacion_received!=0){
-//                        System.out.println("CLIENT TO SERVER: " + fromUser);
-//                        VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
-//                        out.println(fromUser); //Envia por el socket
-//
-//                        if(comprobacion_send != -1){
-//                            //El server me va a enviar los amigos_del_usuario_mensajes
-//                            //Los tengo que guardar en un array de una clase que tenga un array de amigos_del_usuario_mensajes
-//
-//                            //Limpio el array de mensajes ---CAMBIAR---
-//                            array_amigos_mensajes.get(pos).mensajes_array.clear();
-//
-//                            //Me traigo los mensajes de ese usuario en una fecha
-//
-//                                for(int i=0; i<this.num_men_totales; i++){
-//                                    //Si me envía algún mensaje
-//                                    if((fromServer = in.readLine()) != null){
-//                                        System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-//                                        VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-//
-//                                        protocolo.procesarConversacion_Mensajes(fromServer, array_amigos_mensajes.get(pos).mensajes_array, num_men_totales);
-//                                    }
-//                                }
-
-//
-//                            fromUser = protocolo.procesarSalidaConversacion_AllReceived();        
-//                            if (fromUser != null) {
-//                                System.out.println("CLIENT TO SERVER: " + fromUser);
-//                                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
-//
-//                                out.println(fromUser); //Envia por el socket            
-//                            }
-//
-//                        }
-//
-//                    }
-//
-//                }else { //Busca otra fecha
-//                    
-//                }
-//            }
-//                    
-//        } else { //No hay mensajes
-//
-//
-//        }
-//                                 
-//    }
-//                   
-//}
