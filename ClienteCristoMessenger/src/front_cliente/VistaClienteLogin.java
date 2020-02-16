@@ -5,6 +5,7 @@
  */
 package front_cliente;
 
+import back_cliente.AmigosDeUnUsuario_Mensajes;
 import back_cliente.ConexionClienteconServer;
 import java.awt.Image;
 import java.io.IOException;
@@ -171,6 +172,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
         String clave_password = password.getText();
         String user = text_user.getText();
         ArrayList <String> salida;
+        ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario = new ArrayList<AmigosDeUnUsuario_Mensajes> ();
         
         
         if((this.textIP.getText() == "") || (this.textPuerto.getText() == "")){
@@ -185,7 +187,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
         
             ConexionClienteconServer cliente_conexion;
             try {
-                cliente_conexion = new ConexionClienteconServer(this.textIP.getText(), Integer.valueOf(this.textPuerto.getText()), user, clave_password);
+                cliente_conexion = new ConexionClienteconServer(this.textIP.getText(), Integer.valueOf(this.textPuerto.getText()), user, clave_password,array_mensajes_usuario);
                 salida = cliente_conexion.conectar_con_server_login();
                 int comprobar_error = salida.get(0).indexOf("BAD_LOGIN");
             
@@ -208,7 +210,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
                     this.dispose();
                     VistaClienteChats vista2;
                     try {
-                        vista2 = new VistaClienteChats(cliente_conexion); 
+                        vista2 = new VistaClienteChats(cliente_conexion,array_mensajes_usuario); 
                         vista2.label_usuario_activo.setText(user);
                         vista2.setVisible(true);
                         vista2.getFriends(salida);

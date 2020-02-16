@@ -102,6 +102,8 @@ public class ProtocoloServer {
             System.out.println("SERVER: Error de cadena (ALERTA HACKER");
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: Error de cadena (ALERTA HACKER)" + "\n");
         }
+        
+        hebra.setUsuario(usuario);
         return theOutput;
     }
     
@@ -180,6 +182,73 @@ public class ProtocoloServer {
         //4)Mando la cadena
         return theOutput;
     }
+    
+    public String procesarEntradaEnviarMensaje(String entrada,MultiServerThread2 hebra) throws SQLException{        
+        String theOutput = null;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String[] parts = entrada.split("#");
+        String fechahora = parts[1];
+        String usuario_origen = parts[4];
+        String usuario_destino = parts[5];
+        String texto = parts[6];
+        boolean check_user_orig = false, check_user_dest = false, check_friendship=false;
+        
+        //1)- Compruebar que los dos usuarios estan en el sistema
+        check_user_orig = hebra.controladorUsuario.check_user(usuario_origen);
+        check_user_dest = hebra.controladorUsuario.check_user(usuario_destino);
+        
+        if(check_user_orig == true && check_user_dest == true){
+            //2)- Compruebe que los dos usuarios son amigos
+            check_friendship = hebra.controladorAmigos.check_friendship(usuario_origen, usuario_destino);
+            
+            if(check_friendship == true){
+                //3)- Guarde en la base de datos el mensaje 
+                hebra.controladorMensajes.save_message(usuario_origen, usuario_destino,texto,fechahora);
+                hebra.setUsuario_destino(usuario_destino);
+                hebra.setFechahora_men_enviado(fechahora);
+                
+            }else{
+                theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#FORBIDDEN_CHAT";
+            }
+          
+        }else{
+            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#FORBIDDEN_CHAT";
+        }
+        return theOutput;
+    }
+    
+    public String procesarSalidaEnviarMensajeClienteDestino(String entrada){
+        String theOutput = null;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        
+        String[] parts = entrada.split("#");
+        String fechahora = parts[1];
+        String usuario_origen = parts[4];
+        String usuario_destino = parts[5];
+        String texto = parts[6];
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#CHAT#"+usuario_origen+"#"+usuario_destino+"#"+texto+"#"+fechahora;
+        
+        return theOutput;
+    }
+    
+    public String procesarSalidaNotificarMensajeClienteOrigen (String entrada,String usuario,MultiServerThread2 hebra) throws SQLException{
+        String theOutput = null;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        
+        String[] parts = entrada.split("#");
+        String usuario_origen = parts[5];
+        String fechahora = parts[6];
+        
+        //Cambio el booleano read de la bd
+        hebra.controladorMensajes.change_boolean_read(usuario_origen, usuario, fechahora);
+        hebra.setUsuario_destino(usuario_origen);
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#CHAT#"+usuario_origen+"#"+usuario+"#MESSAGE_SUCCESFULLY_PROCESSED#"+fechahora;
+        
+        return theOutput;
+    }
+    
     
 }
 

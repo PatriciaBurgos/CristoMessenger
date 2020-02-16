@@ -46,6 +46,16 @@ public class ControladorMensajes {
         this.message.get_messages(this.message.get_dbname(), this.message.getTabladb(),mensajes, usuario, amigo);   
     }
     
+    public void save_message(String usuario, String amigo, String texto, String fechahora) throws SQLException{
+        this.message.save_message(this.message.get_dbname(), this.message.getTabladb(),usuario,amigo,texto,fechahora);
+    }
     
+    public void change_boolean_send(String usuario, String amigo, String fechahora) throws SQLException{
+        this.message.change_boolean_send(this.message.get_dbname(), this.message.getTabladb(),usuario,amigo,fechahora);
+    }
+    
+    public void change_boolean_read(String usuario, String amigo, String fechahora) throws SQLException{
+        this.message.change_boolean_read(this.message.get_dbname(), this.message.getTabladb(),usuario,amigo,fechahora);
+    }
     
 }

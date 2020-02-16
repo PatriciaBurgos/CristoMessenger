@@ -43,7 +43,9 @@ public class ConexionClienteconServer {
     String auxDate1;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
-    public ConexionClienteconServer(String IP, int port, String user, String pass) throws IOException{
+    ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario;
+    
+    public ConexionClienteconServer(String IP, int port, String user, String pass, ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario) throws IOException{
         ip = IP;
         puerto = port;
         usuario = user;
@@ -56,6 +58,12 @@ public class ConexionClienteconServer {
         System.out.println("CLIENT: IP-->" + ip + " PUERTO--> " + puerto + " USUARIO--> " + usuario + " CONTRASEÑA--> " +contraseña);
 //        VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT:IP-->" + ip + " PUERTO--> " + puerto + " USUARIO--> " + usuario + " CONTRASEÑA--> " +contraseña+ "\n");
          
+        //Creo una hebra que este escuchando por si le envían un mensaje
+        ThreadListeningNewMessages hebra_recibir_mensajes = new ThreadListeningNewMessages (this);
+        hebra_recibir_mensajes.start();
+        
+        ThreadPeticionesUsuario hebra_peticiones_usuario = new ThreadPeticionesUsuario (this);
+        hebra_peticiones_usuario.start();
         
     }
 
@@ -103,7 +111,7 @@ public class ConexionClienteconServer {
     }
     
     
-    public void conectar_con_server_mensajes(String usuario_dest,ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
+    public void conectar_con_server_leer_mensajes(String usuario_dest,ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
     
         //HACER DO WHILE POR SI EN UNA FECHA NO HAY MENSAJES PERO SI HAY EN LA CONVERSACION 
         
@@ -151,9 +159,14 @@ public class ConexionClienteconServer {
         
     }
     
-    
-    
-    
+    public void conectar_con_server_enviar_mensajes(String texto, String usuario_origen, String usuario_dest){
+        //1- Llamo al protocolo para hacer la cadena
+        fromUser = this.protocolo.procesarEnviarMensaje_texto(texto, usuario_origen, usuario_dest);
+        
+        //2- Envio la cadena al server
+        this.enviar_al_server_texto_mensaje();
+        
+    }
     
     
     public void pedir_conversaciones_server_fecha(String usuario_dest){
@@ -228,6 +241,14 @@ public class ConexionClienteconServer {
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
             protocolo.procesarDatosUsuario(fromServer);   
+        }
+    }
+    
+    public void enviar_al_server_texto_mensaje (){
+        if (fromUser != null) {
+            System.out.println("CLIENT TO SERVER: " + fromUser);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+            out.println(fromUser); //Envia por el socket            
         }
     }
     

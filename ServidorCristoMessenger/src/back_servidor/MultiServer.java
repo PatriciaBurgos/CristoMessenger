@@ -32,7 +32,7 @@ public class MultiServer {
         try (ServerSocket serverSocket = new ServerSocket(puerto)) { 
             int i = 0;
             while(listening) {                   
-                MultiServerThread2 hebra = new MultiServerThread2 (serverSocket.accept(),i);
+                MultiServerThread2 hebra = new MultiServerThread2 (serverSocket.accept(),i,this);
                 hebras_array.add(hebra);
                 System.out.println("SERVER: AÑADO HEBRA");
                 VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: AÑADO HEBRA" + "\n");
@@ -57,4 +57,24 @@ public class MultiServer {
             hebras_array.get(i).desconectar();
         }        
     }
+    
+    public boolean buscar_en_hebras_conectadas (String nombre){
+        boolean check = false;
+        for(int i = 0; i<this.hebras_array.size(); i++){
+            if(this.hebras_array.get(i).getName() == nombre){
+                check = true;
+            }
+        }
+        return check;
+    }
+    
+    public void acceder_a_hebra_y_mandar_mensaje(String nombre,String salida){
+        for(int i = 0; i<this.hebras_array.size(); i++){
+            if(this.hebras_array.get(i).getName() == nombre){
+                this.hebras_array.get(i).mandar_salida(salida);
+            }
+        }
+    }
+    
+    
 }

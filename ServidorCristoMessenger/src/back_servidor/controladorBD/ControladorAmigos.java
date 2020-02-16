@@ -38,10 +38,10 @@ public class ControladorAmigos {
         }
     }
     
-//    public boolean comprobar_amistad(String usuario, String amigo) throws SQLException{
-//        Boolean amigos;
-//        amigos = this.friends_modelo.comprobar_amistad(this.friends_modelo.get_dbname(), this.friends_modelo.getTabladb(),usuario, amigo);
-//        return amigos;
-//    }
+    public boolean check_friendship(String usuario, String amigo) throws SQLException{
+        Boolean check;
+        check = this.friends_modelo.check_friendship(this.friends_modelo.get_dbname(), this.friends_modelo.getTabladb(),usuario, amigo);
+        return check;
+    }
     
 }

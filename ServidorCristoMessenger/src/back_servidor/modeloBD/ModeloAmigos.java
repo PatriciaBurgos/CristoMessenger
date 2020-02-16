@@ -54,16 +54,19 @@ public class ModeloAmigos extends BDConnector{
     
     
     //TODO querys
-//
-//    public void query_all_friends () {
-//        setQuery ("SELECT * FROM " + get_dbname() + "." + getTabladb());
-//    }
+
+    public void query_all_friends_user (String id_orig) {
+        this.setQuery("SELECT * FROM "+ get_dbname() + "." + getTabladb()+" WHERE (id_user_orig ='"+id_orig+"');" );
+    }
+    
+    public void query_check_friendship (String usuario, String amigo){
+        this.setQuery("SELECT * FROM"+ get_dbname() + "." + getTabladb()+" WHERE((id_user_orig='"+usuario+"' && id_user_dest='"+amigo+"' && accept_request=1) ||(id_user_dest='"+usuario+"' && id_user_orig='"+amigo+"' && accept_request=1));");
+    }
     
     
     public void get_all_friends_model (String db, String table, ArrayList friends, String id_orig) throws SQLException {
         
-        this.setQuery("SELECT * FROM "+ get_dbname() + "." + getTabladb()+" WHERE (id_user_orig ='"+id_orig+"');" );
-        
+        this.query_all_friends_user(id_orig);
         this.conectar_bd();
        
         try {
@@ -87,30 +90,30 @@ public class ModeloAmigos extends BDConnector{
         }
     }
     
-//    public boolean comprobar_amistad (String db, String table, String usuario, String amigo) throws SQLException {
-//        Boolean amigos = true;
-//        this.query_all_friends();
-//        this.conectar_bd();
-//       
-//        try {
-//            this.set_stmt(this.getConn().createStatement());
-//            
-//            this.set_rs(this.get_stmt().executeQuery(getQuery()));
-//            
-//            while (get_rs().next()) {
-//                
-//                String id_user_orig = get_rs().getString("id_user_orig");
-//                String id_user_dest = get_rs().getString("id_user_dest");
-//                
-//                //COMPROBACION
-//            }
-//        } catch (SQLException e ) {
-//            System.out.println(e);
-//        } 
-//        finally {
-//            if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
-//        }
-//        return amigos;
-//    }
-//    
+    public boolean check_friendship (String db, String table, String usuario, String amigo) throws SQLException {
+        Boolean check = false;
+        this.query_check_friendship(usuario,amigo);
+        this.conectar_bd();
+        int cont=0;
+       
+        try {
+            this.set_stmt(this.getConn().createStatement());
+            
+            this.set_rs(this.get_stmt().executeQuery(getQuery()));
+            
+            while (get_rs().next()) {
+                cont++;
+                if(cont==2){
+                    check = true;
+                }                
+            }
+        } catch (SQLException e ) {
+            System.out.println(e);
+        } 
+        finally {
+            if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
+        }
+        return check;
+    }
+    
 }

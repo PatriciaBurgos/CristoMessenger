@@ -179,23 +179,67 @@ public class ProtocoloCliente {
     
         String cadena_mensajes = salida_server.substring(comprobacion+1);
             
-            String[] parts = cadena_mensajes.split("#");
-            
-            UsuariosMapeo usuario = new UsuariosMapeo();
-            
-            String login = parts[1];
-            usuario.setId_user(login);
-            
-            String nombre = parts[2];
-            usuario.setName(nombre);
-            
-            String apellido1 =parts[3];
-            usuario.setSurname1(apellido1);
-            
-            String apellido2 =parts[4];
-            usuario.setSurname2(apellido2);
+        String[] parts = cadena_mensajes.split("#");
 
-            System.out.println(usuario.toString());
-            
+        UsuariosMapeo usuario = new UsuariosMapeo();
+
+        String login = parts[1];
+        usuario.setId_user(login);
+
+        String nombre = parts[2];
+        usuario.setName(nombre);
+
+        String apellido1 =parts[3];
+        usuario.setSurname1(apellido1);
+
+        String apellido2 =parts[4];
+        usuario.setSurname2(apellido2);
+
+        System.out.println(usuario.toString());            
+    }
+    
+    public String procesarEnviarMensaje_texto(String texto, String usuario_origen, String usuario_destino){
+        String theOutput = null;
+        String usuario_dest = usuario_destino;
+        
+        if(usuario_destino.contains(" --- ")){
+            int empi = usuario_destino.indexOf(" ---");
+            usuario_dest = usuario_destino.substring(0, empi);
+        }
+        
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#CHAT#"+usuario_origen+"#"+usuario_dest+"#"+texto;
+
+        return theOutput;
+    }
+    
+    public String procesarMensajeNuevo(String entrada,ArrayList <AmigosDeUnUsuario_Mensajes> mensajes){
+        String theOutput = null;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String[] parts = entrada.split("#");
+        
+        String login_usuario_del_mensaje = parts[4];
+        String login_usuario_destino = parts[5];
+        String mensaje = parts[6];
+        String fechahora =parts[7];
+        
+        for(int i = 0; i<mensajes.size();i++){
+            if(mensajes.get(i).getId_user()==login_usuario_del_mensaje){
+                mensajes.get(i).num_men_recibidos++;
+                
+                MensajesMapeo mens = new MensajesMapeo();
+                mens.setId_user_orig(login_usuario_del_mensaje);
+                mens.setId_user_dest(login_usuario_destino);
+                mens.setText(mensaje);
+                mens.setDateTime(fechahora);
+                mens.setSend(true);
+                
+                mensajes.get(i).mensajes_array.add(mens);
+            }
+        }
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#CHAT#RECEIVED_MESSAGE#"+login_usuario_del_mensaje+"#"+fechahora;
+        
+        return theOutput;
     }
 }

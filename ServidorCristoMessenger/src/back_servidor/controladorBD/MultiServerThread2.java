@@ -5,6 +5,7 @@
  */
 package back_servidor.controladorBD;
 
+import back_servidor.MultiServer;
 import back_servidor.modeloBD.MensajesMapeo;
 import front_servidor.VistaServer;
 import java.io.BufferedReader;
@@ -24,6 +25,7 @@ import java.util.logging.Logger;
 public class MultiServerThread2 extends Thread {
     private Socket socket = null;
     boolean conectar = true;
+    MultiServer multiServer;
     
     ControladorUsuario controladorUsuario;
     ControladorAmigos controladorAmigos;
@@ -36,14 +38,15 @@ public class MultiServerThread2 extends Thread {
     String entrada_cliente, salida_server;   
     
     public int num_men_fecha;
-    String usuario,amigo;
+    String usuario,amigo,usuario_destino,fechahora_men_enviado;
     
     
-    public MultiServerThread2(Socket socket, int id) throws SQLException, IOException {
+    public MultiServerThread2(Socket socket, int id, MultiServer multiserver) throws SQLException, IOException {
         super("Thread " + id);
         System.out.println("SERVER: THREAD " + id);
         VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: THREAD "+id+ "\n");
         
+        this.multiServer = multiserver;
         this.socket = socket;
         controladorUsuario = new ControladorUsuario();
         controladorAmigos = new ControladorAmigos();
@@ -70,6 +73,22 @@ public class MultiServerThread2 extends Thread {
         this.amigo = amigo;
     }
 
+    public String getUsuario_destino() {
+        return usuario_destino;
+    }
+
+    public void setUsuario_destino(String usuario_destino) {
+        this.usuario_destino = usuario_destino;
+    }
+
+    public String getFechahora_men_enviado() {
+        return fechahora_men_enviado;
+    }
+
+    public void setFechahora_men_enviado(String fechahora_men_enviado) {
+        this.fechahora_men_enviado = fechahora_men_enviado;
+    }
+
    
      
     public void run() {    
@@ -83,17 +102,11 @@ public class MultiServerThread2 extends Thread {
             System.out.println("CLIENT TO SERVER: "+entrada_cliente);
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "CLIENT TO SERVER: " +entrada_cliente+ "\n");
 
-            //Compruebo que esta bien lo primero del protocolo
-//////            int comprobacion_entrada_cliente = entrada_cliente.indexOf("PROTOCOLCRISTOMESSENGER1.0");
-//////            if(comprobacion_entrada_cliente != -1){
-                
+            //Compruebo que esta bien lo primero del protocolo                
             if(entrada_cliente.contains("PROTOCOLCRISTOMESSENGER1.0")){
                 
                 
                 //COMPROBACION LOGIN
-////////                int comprobacion_entrada_cliente_login = entrada_cliente.indexOf("#CLIENT#LOGIN#");
-////////                if(comprobacion_entrada_cliente_login != -1){
-
                 if(entrada_cliente.contains("#CLIENT#LOGIN#")){
                     try {
                         this.hebra_login();
@@ -113,7 +126,8 @@ public class MultiServerThread2 extends Thread {
                     //1 CADENA CLIENTE NUMERO DE MENSAJES TOTAL Y DE UNA FECHA 
                     if((comprobacion_entrada_cliente_mensajes != -1) && (comprobacion_entrada_cliente_mensajes_send==-1) && (comprobacion_entrada_cliente_mensajes_received==-1)){
                         try {
-                            this.hebra_mensajes_numeroTotal_numeroFecha(usuario, amigo);
+                            salida_server = protocolo.procesarEntradaMensajesNumero(entrada_cliente, this, usuario, amigo);
+                            this.mandar_salida(salida_server);
                             
                         } catch (SQLException ex) {
                             Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
@@ -137,16 +151,66 @@ public class MultiServerThread2 extends Thread {
                 
                 //COMPROBACION DATOS USUARIO
                 if(this.entrada_cliente.contains("#ALLDATA_USER#")){
-                    //1- Llamo al protocolo para que me descibre la cadena y 
-                    //1)Compruebe que es un usuario del sistema
-                    //2)Recolecte toda la informacion
-                    //3)Se mande por el socket
+                    //1- Llamo al protocolo para que me descifre la cadena y 
+                        //1)Compruebe que es un usuario del sistema
+                        //2)Recolecte toda la informacion
+                        //3)Se mande por el socket
                     this.salida_server = this.protocolo.procesarEntradaObtenerDatos(this.entrada_cliente,this);
                     //2- Mando los datos o el error al usuario
-                    this.mandar_al_cliente_todos_los_datos_usuario(salida_server);                    
+                    this.mandar_salida(salida_server);                    
                 }
                
                 
+                //COMPROBACION ENVIAR MENSAJE
+                if(this.entrada_cliente.contains("#CLIENT#CHAT#")){
+                    if(!this.entrada_cliente.contains("#RECEIVED_MESSAGE#")){
+                        try {
+                            //1- Llamo al protocolo para que me descrifre la cadena y
+                                //1)- Compruebe que los dos usuarios estan en el sistema
+                                //2)- Compruebe que los dos usuarios son amigos
+                                //3)- Guarde en la base de datos el mensaje
+                            this.salida_server = this.protocolo.procesarEntradaEnviarMensaje(this.entrada_cliente,this);
+                            if(salida_server!=null){
+                                //2- Comprobar a traves del socket que el cliente destino esta conectado
+                                boolean check_conex = false;
+                                check_conex = this.comprobar_conexion_hebra();
+
+                                if(check_conex == true){//EL CLIENTE ESTA CONECTADO
+
+                                    //3- Si esta conectado enviar cadena al protocolo para transformarla en otra
+                                    this.salida_server = this.protocolo.procesarSalidaEnviarMensajeClienteDestino(this.entrada_cliente);
+
+                                    //4- Enviar cadena al usuario destino
+                                    //NO TENGO NI IDEA DE COMO M HACER ESTO!!!!!!!!!!
+                                    this.mandar_al_cliente_destino_nuevo_mensaje(salida_server);
+
+
+                                }       
+
+                            }else{//Ha habido un error en la cadena
+                                this.mandar_salida(salida_server);
+                            }
+
+                        } catch (SQLException ex) {
+                            Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                    }else if(this.entrada_cliente.contains("#RECEIVED_MESSAGE#")){ 
+                        //Este mensaje es del cliente destino
+                        //1- Cambiar booleano read de la bd
+                        try {
+                            this.salida_server = this.protocolo.procesarSalidaNotificarMensajeClienteOrigen(this.entrada_cliente,this.usuario,this);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        //2- Mandar cadena al cliente origen 
+                            //1) Comprobar que el cliente origen esta conectado
+                            //2) Acceder a su socket para mandarle un mensaje
+                        this.mandar_al_cliente_origen_mensaje_bien_procesado(salida_server);
+                    }
+                    
+                
+            }
                 
                 
                 
@@ -158,17 +222,15 @@ public class MultiServerThread2 extends Thread {
 
             //ERROR EN EL PRINCIPIO DE LA CADENA
             }else{
-                salida_server = protocolo.procesarErrorPrincipioCadena();  
-                System.out.println("SERVER: ERROR DE CADENA");
-                VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: ERROR DE CADENA" + "\n");
-                out.println(salida_server);  
+                salida_server = protocolo.procesarErrorPrincipioCadena(); 
+                this.mandar_salida(salida_server);
             }
         }
             
         try {
             socket.close();
         } catch (IOException ex) {
-            Logger.getLogger(MultiServerThread.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
         }        
     }
     
@@ -186,17 +248,19 @@ public class MultiServerThread2 extends Thread {
         } else {
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVEVR TO CLIENT: Login correcto" + "\n");
             System.out.println("SERVER TO CLIENT: Login correcto");
+            
+            this.setName(this.getUsuario());
         }
         
         out.println(salida_server);                        
     }
     
-    public void hebra_mensajes_numeroTotal_numeroFecha(String usuario, String amigo) throws SQLException{
-        salida_server = protocolo.procesarEntradaMensajesNumero(entrada_cliente, this, usuario, amigo);
-        System.out.println("SERVER SALIDA PROTOCOLO: " +salida_server);
-        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida_server + "\n");
-        out.println(salida_server);
-    }
+//    public void hebra_mensajes_numeroTotal_numeroFecha(String usuario, String amigo) throws SQLException{
+//        
+//        System.out.println("SERVER SALIDA PROTOCOLO: " +salida_server);
+//        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida_server + "\n");
+//        out.println(salida_server);
+//    }
     
     public void hebra_mensajes_send (String usuario, String amigo) throws SQLException{
         ArrayList <MensajesMapeo> mensajes = new ArrayList();
@@ -209,13 +273,42 @@ public class MultiServerThread2 extends Thread {
         }
     }
     
-    public void mandar_al_cliente_todos_los_datos_usuario(String salida){
+//    public void mandar_al_cliente_todos_los_datos_usuario(String salida){
+//        System.out.println("SERVER SALIDA PROTOCOLO: " +salida);
+//        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida + "\n");
+//        out.println(salida);  
+//    }
+//    
+//    public void mandar_al_cliente_error_en_cadena_enviar_mensaje(String salida){
+//        System.out.println("SERVER SALIDA PROTOCOLO: " +salida);
+//        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida + "\n");
+//        out.println(salida);  
+//    }
+    
+    public void mandar_salida(String salida){
         System.out.println("SERVER SALIDA PROTOCOLO: " +salida);
         VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida + "\n");
         out.println(salida);  
     }
     
+    public boolean comprobar_conexion_hebra(){
+        boolean check = this.multiServer.buscar_en_hebras_conectadas(this.usuario_destino);
+        return check;
+    }
     
+    public void mandar_al_cliente_destino_nuevo_mensaje(String salida) throws SQLException{
+        //1-Acceder a esa hebra y mandar el mensaje
+        this.multiServer.acceder_a_hebra_y_mandar_mensaje(this.usuario_destino, salida);
+        //2-Cambiar el booleano enviado de la bd
+        this.controladorMensajes.change_boolean_send(this.usuario, this.usuario_destino,this.getFechahora_men_enviado());
+    }
+    
+    public void mandar_al_cliente_origen_mensaje_bien_procesado(String salida){
+        boolean check = this.multiServer.buscar_en_hebras_conectadas(this.usuario_destino);
+        if(check){
+            this.multiServer.acceder_a_hebra_y_mandar_mensaje(this.usuario_destino, salida);
+        }
+    }
     
     public void desconectar (){
         System.out.println("SERVER: DESCONECTO HEBRA");
@@ -223,6 +316,8 @@ public class MultiServerThread2 extends Thread {
                         
         conectar=false;
     }
+    
+    
 }
 
 
