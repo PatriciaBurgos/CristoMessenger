@@ -128,7 +128,7 @@ public class ConexionClienteconServer {
         }else{
             auxDate1 = array_amigos_mensajes.get(pos).ultima_fecha_buscada;
         }        
-        
+       
         do{
             //1-Pido los mensajes en una fecha y se lo mando al server            
             this.pedir_conversaciones_server_fecha(usuario_dest);
@@ -147,7 +147,7 @@ public class ConexionClienteconServer {
                 }
             }
         }while(this.num_men_dia==0 && this.num_men_totales!=0 && array_amigos_mensajes.get(pos).getNum_men_recibidos() != this.num_men_totales);
-        
+       
         array_amigos_mensajes.get(pos).setUltima_fecha_buscada(auxDate1);
     
     }

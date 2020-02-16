@@ -41,9 +41,9 @@ public class ControladorMensajes {
         return num;    
     }
     
-    public void get_message_send(String usuario, String amigo, ArrayList mensajes) throws SQLException{
+    public void get_message_send(String usuario, String amigo, ArrayList mensajes, String fecha) throws SQLException{
         //Aqui me voy a traer todos los mensajes y los voy a mandar uno a uno+       
-        this.message.get_messages(this.message.get_dbname(), this.message.getTabladb(),mensajes, usuario, amigo);   
+        this.message.get_messages(this.message.get_dbname(), this.message.getTabladb(),mensajes, usuario, amigo, fecha);   
     }
     
     public void save_message(String usuario, String amigo, String texto, String fechahora) throws SQLException{

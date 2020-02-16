@@ -38,7 +38,7 @@ public class MultiServerThread2 extends Thread {
     String entrada_cliente, salida_server;   
     
     public int num_men_fecha;
-    String usuario,amigo,usuario_destino,fechahora_men_enviado;
+    String usuario,amigo,usuario_destino,fechahora_men_enviado, fechahora_men_leer;
     
     
     public MultiServerThread2(Socket socket, int id, MultiServer multiserver) throws SQLException, IOException {
@@ -89,6 +89,16 @@ public class MultiServerThread2 extends Thread {
         this.fechahora_men_enviado = fechahora_men_enviado;
     }
 
+    public String getFechahora_men_leer() {
+        return fechahora_men_leer;
+    }
+
+    public void setFechahora_men_leer(String fechahora_men_leer) {
+        this.fechahora_men_leer = fechahora_men_leer;
+    }
+    
+    
+
      
     public void run() {    
         while(conectar){
@@ -135,7 +145,7 @@ public class MultiServerThread2 extends Thread {
                         //2 CADENA CLIENTE OK SEND
                     }else if (comprobacion_entrada_cliente_mensajes_send != -1){
                         try {
-                            this.hebra_mensajes_send(usuario,amigo);
+                            this.hebra_mensajes_send(usuario,amigo,fechahora_men_leer);
                         } catch (SQLException ex) {
                             Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -262,10 +272,10 @@ public class MultiServerThread2 extends Thread {
 //        out.println(salida_server);
 //    }
     
-    public void hebra_mensajes_send (String usuario, String amigo) throws SQLException{
+    public void hebra_mensajes_send (String usuario, String amigo, String fecha) throws SQLException{
         ArrayList <MensajesMapeo> mensajes = new ArrayList();
         for(int i=0; i<num_men_fecha; i++){
-            salida_server = protocolo.procesarEntradaMensajesSend(entrada_cliente, this,usuario,amigo,mensajes);
+            salida_server = protocolo.procesarEntradaMensajesSend(entrada_cliente, this,usuario,amigo,mensajes,fecha);
             salida_server+=mensajes.get(i).toString();            
             System.out.println("SERVER SALIDA PROTOCOLO: " +salida_server);
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida_server + "\n");

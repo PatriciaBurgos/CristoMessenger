@@ -87,6 +87,7 @@ public class MensajesMapeo {
     public String toString() {
         return "#" + id_user_orig + "#" + id_user_dest + "#" + datetime + "#" + text;
     }
+
     
     
     

@@ -3,9 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/back_cliente/ThreadListeningNewMessages.java</file>
+            <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/back_cliente/AmigosDeUnUsuario_Mensajes.java</file>
+            <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/front_cliente/VistaClienteChats.java</file>
             <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/back_cliente/ConexionClienteconServer.java</file>
-            <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/back_cliente/ThreadPeticionesUsuario.java</file>
+            <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/back_cliente/ProtocoloCliente.java</file>
+            <file>file:/C:/Users/patri/Documents/NetBeansProjects/ClienteCristoMessenger/src/ClasesMapeadoras/MensajesMapeo.java</file>
         </group>
     </open-files>
 </project-private>

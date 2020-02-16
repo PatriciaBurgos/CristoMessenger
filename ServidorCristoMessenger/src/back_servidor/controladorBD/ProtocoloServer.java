@@ -110,7 +110,7 @@ public class ProtocoloServer {
     public String procesarEntradaMensajesNumero (String entrada, MultiServerThread2 hebra, String usuario, String amigo) throws SQLException{
         String theOutput = null;
         int num_mensajes_totales=0, num_mensajes_fecha=0;
-        String fecha_mensajes;     
+        String fecha_mensajes = "";     
         
         //1-Compruebo que contiene el MSGS
         if(entrada.contains("#MSGS#")){
@@ -140,14 +140,15 @@ public class ProtocoloServer {
         }   
         
         hebra.num_men_fecha=num_mensajes_fecha;
+        hebra.fechahora_men_leer = fecha_mensajes;
         return theOutput;        
     }
 
-    public String procesarEntradaMensajesSend(String entrada, MultiServerThread2 hebra, String usuario, String amigo, ArrayList mensajes) throws SQLException{
+    public String procesarEntradaMensajesSend(String entrada, MultiServerThread2 hebra, String usuario, String amigo, ArrayList mensajes, String fecha) throws SQLException{
         String theOutput = null;
         //1- LLamar al controlador y al modelo para recojer un mensaje
         //Pasar i al controlador e ir de uno en uno 
-        hebra.controladorMensajes.get_message_send(usuario, amigo,mensajes);
+        hebra.controladorMensajes.get_message_send(usuario, amigo,mensajes,fecha);
         
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#MSGS";

@@ -61,8 +61,10 @@ public class MultiServer {
     public boolean buscar_en_hebras_conectadas (String nombre){
         boolean check = false;
         for(int i = 0; i<this.hebras_array.size(); i++){
-            if(this.hebras_array.get(i).getName() == nombre){
+            System.out.println("nombre = " + this.hebras_array.get(i).getName());
+            if(this.hebras_array.get(i).getName().equals(nombre)){
                 check = true;
+                System.out.println("ENTRA");
             }
         }
         return check;
@@ -70,7 +72,7 @@ public class MultiServer {
     
     public void acceder_a_hebra_y_mandar_mensaje(String nombre,String salida){
         for(int i = 0; i<this.hebras_array.size(); i++){
-            if(this.hebras_array.get(i).getName() == nombre){
+            if(this.hebras_array.get(i).getName().equals(nombre)){
                 this.hebras_array.get(i).mandar_salida(salida);
             }
         }

@@ -10,6 +10,8 @@ import ClasesMapeadoras.MensajesMapeo;
 import ClasesMapeadoras.UsuariosMapeo;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  *
@@ -49,5 +51,6 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
         this.num_men_recibidos = num_men_recibidos;
     }
 
+    
     
 }

@@ -130,6 +130,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
         label_imagen_user = new javax.swing.JLabel();
         scroll = new javax.swing.JScrollPane();
         text_area = new javax.swing.JTextArea();
+        cargar = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         TextAreaDebug = new javax.swing.JTextArea();
@@ -138,7 +139,6 @@ public class VistaClienteChats extends javax.swing.JFrame {
 
         text.setColumns(20);
         text.setRows(5);
-        text.setText("Aqui van los mensajes\n");
         jScrollPane2.setViewportView(text);
 
         label_usuario_activo.setText("Aqui va el usuario activo");
@@ -163,6 +163,18 @@ public class VistaClienteChats extends javax.swing.JFrame {
         text_area.setRows(5);
         scroll.setViewportView(text_area);
 
+        cargar.setText("CARGAR");
+        cargar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cargarMouseClicked(evt);
+            }
+        });
+        cargar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cargarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panel_chatLayout = new javax.swing.GroupLayout(panel_chat);
         panel_chat.setLayout(panel_chatLayout);
         panel_chatLayout.setHorizontalGroup(
@@ -178,9 +190,11 @@ public class VistaClienteChats extends javax.swing.JFrame {
                                 .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(panel_chatLayout.createSequentialGroup()
                                         .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 502, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(boton_envio_mensajes))
+                                        .addComponent(boton_envio_mensajes)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(cargar, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(panel_chatLayout.createSequentialGroup()
                                         .addComponent(label_imagen_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -216,9 +230,10 @@ public class VistaClienteChats extends javax.swing.JFrame {
                             .addGroup(panel_chatLayout.createSequentialGroup()
                                 .addComponent(scroll, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(boton_envio_mensajes, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                                    .addComponent(boton_envio_mensajes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
+                                    .addComponent(cargar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(label_imagen_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(20, Short.MAX_VALUE))
@@ -291,6 +306,35 @@ public class VistaClienteChats extends javax.swing.JFrame {
     }//GEN-LAST:event_boton_envio_mensajesActionPerformed
 
     private void list_friendsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_friendsMouseClicked
+        this.seleccionar_amigo(evt);                       
+        try {
+            this.get_messages_friend(label_amigo.getText(),pos_amigo);
+           // this.cargar_mensajes_anteriores(label_amigo.getText(),pos_amigo);
+        } catch (IOException ex) {
+            Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+        }
+           
+    }//GEN-LAST:event_list_friendsMouseClicked
+
+    private void cargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarActionPerformed
+    
+        try {
+            this.cargar_mensajes_anteriores(label_amigo.getText(),pos_amigo);
+        } catch (IOException ex) {
+            Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+        }       
+    }//GEN-LAST:event_cargarActionPerformed
+
+    private void cargarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cargarMouseClicked
+//        this.seleccionar_amigo(evt);
+//        try {
+//            this.cargar_mensajes_anteriores(label_amigo.getText(),pos_amigo);
+//        } catch (IOException ex) {
+//            Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }//GEN-LAST:event_cargarMouseClicked
+
+    public void seleccionar_amigo(java.awt.event.MouseEvent evt){
         JList theList = (JList) evt.getSource();
         if (evt.getClickCount() == 2) {
             int index = theList.locationToIndex(evt.getPoint());
@@ -300,17 +344,10 @@ public class VistaClienteChats extends javax.swing.JFrame {
                 label_amigo.setText(o.toString());
                 friend_mess = o.toString();
                 pos_amigo= index;
-                //String user_activo_label = label_usuario_activo.getText();                        
-
-                try {
-                    this.get_messages_friend(label_amigo.getText(),index);
-                } catch (IOException ex) {
-                    Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
         }
-    }//GEN-LAST:event_list_friendsMouseClicked
-    
+    }
+
     public void getFriends (ArrayList amigos) {
         for (int i = 0; i<amigos.size(); i++) { 
             listModel.addElement(amigos.get(i));
@@ -339,6 +376,18 @@ public class VistaClienteChats extends javax.swing.JFrame {
         this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
     }
     
+    public void cargar_mensajes_anteriores(String user_dest, int pos) throws IOException {
+        
+        //Tengo que cambiar lo de los amigos_del_usuario_mensajes
+        this.conexionCliente.conectar_con_server_leer_mensajes(user_dest,amigos_del_usuario_mensajes, pos);
+      
+        this.text_area.setText("");
+        for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){
+            this.text_area.setText(amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText()+"\n" +text_area.getText());            
+        }
+        
+        this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
+    }
     
     public void enviar_mensaje(String texto,int pos){
         this.conexionCliente.conectar_con_server_enviar_mensajes(texto,this.user_act,this.friend_mess);        
@@ -410,6 +459,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public static javax.swing.JTextArea TextAreaDebug;
     private javax.swing.JButton boton_envio_mensajes;
+    private javax.swing.JButton cargar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
