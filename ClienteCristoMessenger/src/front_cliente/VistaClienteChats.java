@@ -17,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -278,7 +280,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Mensaje demasiado largo",   "Mensaje de error",
                         JOptionPane.ERROR_MESSAGE);
         } else{
-            this.enviar_mensaje(texto);
+            this.enviar_mensaje(texto,pos_amigo);
         }
         
 
@@ -297,6 +299,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
                 System.out.println("Double-clicked on: " + o.toString());
                 label_amigo.setText(o.toString());
                 friend_mess = o.toString();
+                pos_amigo= index;
                 //String user_activo_label = label_usuario_activo.getText();                        
 
                 try {
@@ -336,10 +339,28 @@ public class VistaClienteChats extends javax.swing.JFrame {
         this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
     }
     
-    public void enviar_mensaje(String texto){
-        this.conexionCliente.conectar_con_server_enviar_mensajes(texto,this.user_act,this.friend_mess);
+    
+    public void enviar_mensaje(String texto,int pos){
+        this.conexionCliente.conectar_con_server_enviar_mensajes(texto,this.user_act,this.friend_mess);        
+        this.guardar_mensaje_memoria_local(texto, pos);         
         
-        
+    }
+    
+    public void guardar_mensaje_memoria_local(String texto, int pos){
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        //for(int i = 0; i<this.amigos_del_usuario_mensajes.size();i++){
+           // if(this.amigos_del_usuario_mensajes.get(pos).getId_user() == this.friend_mess){
+                MensajesMapeo mess = new MensajesMapeo();
+                mess.setId_user_orig(user_act);
+                mess.setId_user_dest(friend_mess);
+                mess.setText(texto);
+                mess.setDateTime(sdf.format(timestamp));
+                amigos_del_usuario_mensajes.get(pos).mensajes_array.add(mess);
+                
+                this.text_area.setText(text_area.getText()+amigos_del_usuario_mensajes.get(pos).getId_user()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(amigos_del_usuario_mensajes.get(pos).mensajes_array.size()-1).getText()+"\n");            
+
+            //}
+        //}
     }
     
     
@@ -423,4 +444,6 @@ public class VistaClienteChats extends javax.swing.JFrame {
     
     ConexionClienteconServer conexionCliente;
     ArrayList <AmigosDeUnUsuario_Mensajes> amigos_del_usuario_mensajes;
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    int pos_amigo;
 }

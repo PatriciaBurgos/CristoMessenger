@@ -71,7 +71,7 @@ public class ModeloMensajes extends BDConnector{
     }
     
     public void query_messages_change_read(String usuario, String amigo, String fecha){
-        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET read = 1 WHERE id_user_orig = '"+usuario+"' and id_user_dest = '"+amigo+"' and datetime = '"+fecha+"';");
+        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET read_msg = 1 WHERE id_user_orig = '"+usuario+"' and id_user_dest = '"+amigo+"' and datetime = '"+fecha+"';");
     }
 
     public void get_messages(String db, String table, ArrayList mess, String usuario, String amigo) throws SQLException {

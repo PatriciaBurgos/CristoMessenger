@@ -199,7 +199,7 @@ public class ProtocoloCliente {
     }
     
     public String procesarEnviarMensaje_texto(String texto, String usuario_origen, String usuario_destino){
-        String theOutput = null;
+        String theOutput = "";
         String usuario_dest = usuario_destino;
         
         if(usuario_destino.contains(" --- ")){

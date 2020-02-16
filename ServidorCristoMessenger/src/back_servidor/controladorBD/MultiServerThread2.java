@@ -89,7 +89,6 @@ public class MultiServerThread2 extends Thread {
         this.fechahora_men_enviado = fechahora_men_enviado;
     }
 
-   
      
     public void run() {    
         while(conectar){
@@ -170,7 +169,7 @@ public class MultiServerThread2 extends Thread {
                                 //2)- Compruebe que los dos usuarios son amigos
                                 //3)- Guarde en la base de datos el mensaje
                             this.salida_server = this.protocolo.procesarEntradaEnviarMensaje(this.entrada_cliente,this);
-                            if(salida_server!=null){
+                            if(salida_server == null){
                                 //2- Comprobar a traves del socket que el cliente destino esta conectado
                                 boolean check_conex = false;
                                 check_conex = this.comprobar_conexion_hebra();
@@ -183,9 +182,10 @@ public class MultiServerThread2 extends Thread {
                                     //4- Enviar cadena al usuario destino
                                     //NO TENGO NI IDEA DE COMO M HACER ESTO!!!!!!!!!!
                                     this.mandar_al_cliente_destino_nuevo_mensaje(salida_server);
-
-
-                                }       
+                                }else{
+                                    System.out.println("SERVER: El cliente destino no esta conectado");
+                                    VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: El cliente destino no esta conectado" + "\n");
+                                }
 
                             }else{//Ha habido un error en la cadena
                                 this.mandar_salida(salida_server);

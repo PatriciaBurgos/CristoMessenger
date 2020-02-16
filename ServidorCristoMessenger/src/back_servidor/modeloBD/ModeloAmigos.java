@@ -60,7 +60,7 @@ public class ModeloAmigos extends BDConnector{
     }
     
     public void query_check_friendship (String usuario, String amigo){
-        this.setQuery("SELECT * FROM"+ get_dbname() + "." + getTabladb()+" WHERE((id_user_orig='"+usuario+"' && id_user_dest='"+amigo+"' && accept_request=1) ||(id_user_dest='"+usuario+"' && id_user_orig='"+amigo+"' && accept_request=1));");
+        this.setQuery("SELECT * FROM "+ get_dbname() + "." + getTabladb()+" WHERE((id_user_orig='"+usuario+"' and id_user_dest='"+amigo+"' and accept_request=1) or (id_user_dest='"+usuario+"' and id_user_orig='"+amigo+"' and accept_request=1));");
     }
     
     

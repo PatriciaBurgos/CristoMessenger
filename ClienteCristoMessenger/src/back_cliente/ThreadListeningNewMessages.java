@@ -30,24 +30,7 @@ public class ThreadListeningNewMessages extends Thread {
                 if((conexionCliente.fromServer = conexionCliente.in.readLine()) != null){
                     
                     if(conexionCliente.fromServer.contains("#SERVER#CHAT#") && !conexionCliente.fromServer.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
-                        if(!conexionCliente.fromServer.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
-                            //RECIVO DEL SERVIDOR
-                            System.out.println("CLIENT RECEIVE TO SERVER: " + conexionCliente.fromServer);
-                            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + conexionCliente.fromServer+ "\n");
-                            //Guardo el mensaje y hago la cadena para enviarla al server
-                            conexionCliente.fromUser = conexionCliente.protocolo.procesarMensajeNuevo(conexionCliente.fromServer,this.conexionCliente.array_mensajes_usuario);
-
-                            //ENVIO AL SERVIDOR
-                            if (conexionCliente.fromUser != null) {
-                                System.out.println("CLIENT TO SERVER: " + conexionCliente.fromUser);
-                                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + conexionCliente.fromUser+ "\n");
-                                conexionCliente.out.println(conexionCliente.fromUser); //Envia por el socket            
-                            }
-                            
-                        }else{
-                            System.out.println("CLIENT RECEIVE TO SERVER: " + conexionCliente.fromServer);
-                            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + conexionCliente.fromServer+ "\n");
-                        }
+                        conexionCliente.recivo_mensaje();
                     }
                 }
             } catch (IOException ex) { 

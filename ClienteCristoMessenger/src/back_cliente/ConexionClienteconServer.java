@@ -45,6 +45,8 @@ public class ConexionClienteconServer {
     
     ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario;
     
+    ThreadListeningNewMessages hebra_recibir_mensajes;
+    
     public ConexionClienteconServer(String IP, int port, String user, String pass, ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario) throws IOException{
         ip = IP;
         puerto = port;
@@ -59,12 +61,12 @@ public class ConexionClienteconServer {
 //        VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT:IP-->" + ip + " PUERTO--> " + puerto + " USUARIO--> " + usuario + " CONTRASEÑA--> " +contraseña+ "\n");
          
         //Creo una hebra que este escuchando por si le envían un mensaje
-        ThreadListeningNewMessages hebra_recibir_mensajes = new ThreadListeningNewMessages (this);
-        hebra_recibir_mensajes.start();
+        hebra_recibir_mensajes = new ThreadListeningNewMessages (this);
         
-        ThreadPeticionesUsuario hebra_peticiones_usuario = new ThreadPeticionesUsuario (this);
-        hebra_peticiones_usuario.start();
         
+//        ThreadPeticionesUsuario hebra_peticiones_usuario = new ThreadPeticionesUsuario (this);
+//        hebra_peticiones_usuario.start();
+//        
     }
 
     public int getNum_men_totales() {
@@ -106,6 +108,11 @@ public class ConexionClienteconServer {
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
 //                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
             salida = protocolo.procesarSalidaLogin(fromServer);
+            
+            if(salida.contains("#SERVER#LOGIN_CORRECT#")){
+                this.hebra_recibir_mensajes.start();
+            }
+            
         }        
         return salida;
     }
@@ -249,6 +256,27 @@ public class ConexionClienteconServer {
             System.out.println("CLIENT TO SERVER: " + fromUser);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
             out.println(fromUser); //Envia por el socket            
+        }
+    }
+    
+    synchronized public void recivo_mensaje(){
+        if(!fromServer.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
+            //RECIVO DEL SERVIDOR
+            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+            //Guardo el mensaje y hago la cadena para enviarla al server
+            fromUser = protocolo.procesarMensajeNuevo(fromServer,this.array_mensajes_usuario);
+
+            //ENVIO AL SERVIDOR
+            if (fromUser != null) {
+                System.out.println("CLIENT TO SERVER: " + fromUser);
+                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+                out.println(fromUser); //Envia por el socket            
+            }
+
+        }else{
+            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
         }
     }
     
