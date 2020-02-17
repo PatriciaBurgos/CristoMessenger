@@ -250,6 +250,28 @@ public class ProtocoloServer {
         return theOutput;
     }
     
+    public String procesarEntradaEstado(String entrada, MultiServerThread2 hebra) throws SQLException{
+        boolean check = false;
+        String theOutput = "", estado_conex;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        
+        String[] parts = entrada.split("#");
+        String amigo = parts[5];
+        hebra.setAmigoestado(amigo);
+        check = hebra.multiServer.buscar_en_hebras_conectadas(amigo);
+        
+        //CAMBIO ATRIBUTO EN BD
+        hebra.controladorUsuario.cambiarestado(amigo, check);
+        if(check==true){
+            estado_conex = "CONNECTED";
+        }else{
+            estado_conex = "NOT_CONNECTED";
+        }
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#STATUS#"+amigo+"#"+estado_conex;
+                
+        return theOutput;
+    }
+    
     
 }
 

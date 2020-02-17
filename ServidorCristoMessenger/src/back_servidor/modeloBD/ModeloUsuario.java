@@ -56,7 +56,10 @@ public class ModeloUsuario extends BDConnector{
     public void query_search_user(String usuario_login){
         this.setQuery("SELECT * FROM "+get_dbname()+"."+getTabladb()+" WHERE id_user = '" + usuario_login+"';");
     }
-       
+
+    public void query_change_status(String usuario, boolean status){
+        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET state = "+status+" WHERE id_user = '"+usuario+"';");
+    }
     
     public boolean check_user_login (String db, String table, String usuario_login, String usuario_contrasenia, boolean check) throws SQLException {
       
@@ -162,6 +165,22 @@ public class ModeloUsuario extends BDConnector{
         finally {
             if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
         }
+    }
+    
+    public void changestatus(String usuario, boolean check) throws SQLException{
+        this.query_change_status(usuario, check);
+        this.conectar_bd();
+        
+        try {           
+            this.set_stmt(this.getConn().createStatement());            
+            this.stmt.executeUpdate(this.getQuery());
+            
+        } catch (SQLException e ) {
+            System.out.println(e);
+        } 
+        finally {
+            if (get_stmt() != null) { get_stmt().close(); this.desconectar_bd();}
+        }   
     }
     
 }

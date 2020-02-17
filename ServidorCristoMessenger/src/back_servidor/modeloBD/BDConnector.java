@@ -40,6 +40,14 @@ public class BDConnector {
         ip = /*"clasedam2.ddns.net"*/ "localhost";
         puerto = "3306";
         dbname = /*"cristomessenger"*/"cristomessengerlocal";
+        
+//        user = "clasedam2"/*"root"*/;
+//        password = "root" /*"newroot"*/;
+//        sgbd = "mysql";
+//        ip = "clasedam2.ddns.net" /*"localhost"*/;
+//        puerto = "3306";
+//        dbname = "cristomessenger"/*"cristomessengerlocal"*/;
+        
         stmt = null;       
         rs = null; 
         

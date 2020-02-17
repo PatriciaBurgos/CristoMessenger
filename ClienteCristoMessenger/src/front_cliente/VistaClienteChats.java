@@ -317,7 +317,6 @@ public class VistaClienteChats extends javax.swing.JFrame {
     }//GEN-LAST:event_list_friendsMouseClicked
 
     private void cargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarActionPerformed
-    
         try {
             this.cargar_mensajes_anteriores(label_amigo.getText(),pos_amigo);
         } catch (IOException ex) {
@@ -336,7 +335,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
 
     public void seleccionar_amigo(java.awt.event.MouseEvent evt){
         JList theList = (JList) evt.getSource();
-        if (evt.getClickCount() == 2) {
+        //if (evt.getClickCount() == 2) {
             int index = theList.locationToIndex(evt.getPoint());
             if (index >= 0) {
                 Object o = theList.getModel().getElementAt(index);
@@ -345,7 +344,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
                 friend_mess = o.toString();
                 pos_amigo= index;
             }
-        }
+      //  }
     }
 
     public void getFriends (ArrayList amigos) {
@@ -367,10 +366,12 @@ public class VistaClienteChats extends javax.swing.JFrame {
         
         //Tengo que cambiar lo de los amigos_del_usuario_mensajes
         this.conexionCliente.conectar_con_server_leer_mensajes(user_dest,amigos_del_usuario_mensajes, pos);
-      
+               
+        
         this.text_area.setText("");
         for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){
-            this.text_area.setText(text_area.getText()+amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText()+"\n");            
+            this.amigos_del_usuario_mensajes.get(i).ordenar();
+            this.text_area.setText(text_area.getText()+amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText()+ "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getDatetime()+"\n");            
         }
         
         this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
@@ -383,7 +384,8 @@ public class VistaClienteChats extends javax.swing.JFrame {
       
         this.text_area.setText("");
         for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){
-            this.text_area.setText(amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText()+"\n" +text_area.getText());            
+            this.amigos_del_usuario_mensajes.get(i).ordenar();
+            this.text_area.setText(amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getDatetime()+"\n"+text_area.getText());            
         }
         
         this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
@@ -405,9 +407,10 @@ public class VistaClienteChats extends javax.swing.JFrame {
                 mess.setText(texto);
                 mess.setDateTime(sdf.format(timestamp));
                 amigos_del_usuario_mensajes.get(pos).mensajes_array.add(mess);
+                //this.amigos_del_usuario_mensajes.get(pos).setNum_men_recibidos(amigos_del_usuario_mensajes.get(pos).getNum_men_recibidos()+1);
                 
-                this.text_area.setText(text_area.getText()+amigos_del_usuario_mensajes.get(pos).getId_user()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(amigos_del_usuario_mensajes.get(pos).mensajes_array.size()-1).getText()+"\n");            
-
+                this.text_area.setText(this.text_area.getText()+this.user_act+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(amigos_del_usuario_mensajes.get(pos).mensajes_array.size()-1).getText()+ "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(amigos_del_usuario_mensajes.get(pos).mensajes_array.size()-1).getDatetime()+"\n");            
+                
             //}
         //}
     }

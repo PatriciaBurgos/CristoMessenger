@@ -74,5 +74,8 @@ public class ControladorUsuario {
         }
     }
     
+    public void cambiarestado(String usuario, boolean check) throws SQLException{
+        usuario_modelo.changestatus(usuario, check);
+    }
     
 }

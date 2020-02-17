@@ -10,6 +10,7 @@ import ClasesMapeadoras.MensajesMapeo;
 import ClasesMapeadoras.UsuariosMapeo;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -18,7 +19,7 @@ import java.util.Comparator;
  * @author patri
  */
 public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
-    public ArrayList <MensajesMapeo> mensajes_array;
+    public ArrayList<MensajesMapeo> mensajes_array;
     int num_amigos;
     String ultima_fecha_buscada;
     int num_men_recibidos;
@@ -51,6 +52,26 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
         this.num_men_recibidos = num_men_recibidos;
     }
 
+//    public void ordenar(){
+//        Arrays.sort(this.mensajes_array);
+//    }
     
+    public void ordenar(){
+        Collections.sort(this.mensajes_array, (MensajesMapeo m1, MensajesMapeo m2) -> {
+            Timestamp f1 = Timestamp.valueOf(m1.getDatetime());
+            long fecha1 = f1.getTime();
+            
+            Timestamp f2 = Timestamp.valueOf(m1.getDatetime());
+            long fecha2 = f2.getTime();
+            
+            if(fecha1>fecha2){
+                return 1;
+            }
+            if(fecha2<fecha1){
+                return -1;
+            }
+            return 0;
+        });
+    }
     
 }

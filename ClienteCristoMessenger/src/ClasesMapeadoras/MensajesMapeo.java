@@ -9,7 +9,7 @@ package ClasesMapeadoras;
  *
  * @author patri
  */
-public class MensajesMapeo {
+public class MensajesMapeo implements Comparable<MensajesMapeo>{
     private String id_user_orig;
     private String id_user_dest;
     private String datetime;
@@ -88,7 +88,16 @@ public class MensajesMapeo {
         return "#" + id_user_orig + "#" + id_user_dest + "#" + datetime + "#" + text;
     }
 
-    
+    @Override
+    public int compareTo(MensajesMapeo o) {
+        if ((Integer.parseInt(datetime)) < Integer.parseInt(o.datetime)) {
+            return -1;
+        }
+        if ((Integer.parseInt(datetime)) > Integer.parseInt(o.datetime)) {
+            return 1;
+        }
+        return 0;
+    }       
     
     
 }

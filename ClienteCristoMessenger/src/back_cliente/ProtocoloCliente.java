@@ -242,4 +242,13 @@ public class ProtocoloCliente {
         
         return theOutput;
     }
+    
+    public String procesarEstadoUsuario(String usuario, UsuariosMapeo amigo){
+        String theOutput = null;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#STATUS#"+usuario+"#"+amigo;
+
+        return theOutput;
+    }
 }

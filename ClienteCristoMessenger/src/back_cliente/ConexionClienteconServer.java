@@ -46,6 +46,7 @@ public class ConexionClienteconServer {
     ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario;
     
     ThreadListeningNewMessages hebra_recibir_mensajes;
+    ThreadEstadoAmigos hebra_estados;
     
     public ConexionClienteconServer(String IP, int port, String user, String pass, ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario) throws IOException{
         ip = IP;
@@ -62,10 +63,12 @@ public class ConexionClienteconServer {
          
         //Creo una hebra que este escuchando por si le envían un mensaje
         hebra_recibir_mensajes = new ThreadListeningNewMessages (this);
-        
+        hebra_estados = new ThreadEstadoAmigos(this);
         
 //        ThreadPeticionesUsuario hebra_peticiones_usuario = new ThreadPeticionesUsuario (this);
 //        hebra_peticiones_usuario.start();
+
+        this.array_mensajes_usuario = array_mensajes_usuario;
 //        
     }
 
@@ -89,7 +92,7 @@ public class ConexionClienteconServer {
     
     
     
-    public ArrayList conectar_con_server_login() throws IOException{
+    synchronized public ArrayList conectar_con_server_login() throws IOException{
         Boolean check = false;
         ArrayList <String> salida = new ArrayList();         
                     
@@ -109,8 +112,12 @@ public class ConexionClienteconServer {
 //                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
             salida = protocolo.procesarSalidaLogin(fromServer);
             
-            if(salida.contains("#SERVER#LOGIN_CORRECT#")){
+            if(fromServer.contains("#SERVER#LOGIN_CORRECT#")){
                 this.hebra_recibir_mensajes.start();
+                //PONER UN IF POR SI NO TENGO AMIGOS
+                //ACTUALIZAR LA VISTA CUANDO ACTUALICE
+                //VER EL ERROR QUE ME DA
+                this.hebra_estados.start();
             }
             
         }        
@@ -118,8 +125,9 @@ public class ConexionClienteconServer {
     }
     
     
-    public void conectar_con_server_leer_mensajes(String usuario_dest,ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
-    
+    synchronized public void conectar_con_server_leer_mensajes(String usuario_dest,ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
+         
+        
         //HACER DO WHILE POR SI EN UNA FECHA NO HAY MENSAJES PERO SI HAY EN LA CONVERSACION 
         
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -211,7 +219,7 @@ public class ConexionClienteconServer {
         }
     }
     
-    public void recibir_mensajes_un_dia(ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
+    synchronized public void recibir_mensajes_un_dia(ArrayList <AmigosDeUnUsuario_Mensajes> array_amigos_mensajes, int pos) throws IOException{
        // array_amigos_mensajes.get(pos).mensajes_array.clear();
         
         //Me traigo los mensajes de un usuario en una fecha
@@ -266,7 +274,7 @@ public class ConexionClienteconServer {
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
             //Guardo el mensaje y hago la cadena para enviarla al server
             fromUser = protocolo.procesarMensajeNuevo(fromServer,this.array_mensajes_usuario);
-
+            
             //ENVIO AL SERVIDOR
             if (fromUser != null) {
                 System.out.println("CLIENT TO SERVER: " + fromUser);
@@ -277,6 +285,24 @@ public class ConexionClienteconServer {
         }else{
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+        }
+    }
+    
+    synchronized public void comprobar_estados(){
+        for(int i= 0; i<this.array_mensajes_usuario.size();i++){
+            this.protocolo.procesarEstadoUsuario(this.usuario,this.array_mensajes_usuario.get(i));
+            //ENVIO AL SERVIDOR
+            if (fromUser != null) {
+                System.out.println("CLIENT TO SERVER: " + fromUser);
+                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+                out.println(fromUser); //Envia por el socket            
+            }
+            
+            //RECIVO DEL SERVIDOR
+            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+            //Guardo el mensaje y hago la cadena para enviarla al server
+            fromUser = protocolo.procesarMensajeNuevo(fromServer,this.array_mensajes_usuario);
         }
     }
     

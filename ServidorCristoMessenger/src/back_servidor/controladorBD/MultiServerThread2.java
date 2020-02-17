@@ -38,7 +38,7 @@ public class MultiServerThread2 extends Thread {
     String entrada_cliente, salida_server;   
     
     public int num_men_fecha;
-    String usuario,amigo,usuario_destino,fechahora_men_enviado, fechahora_men_leer;
+    String usuario,amigo,usuario_destino,fechahora_men_enviado, fechahora_men_leer, amigoestado;
     
     
     public MultiServerThread2(Socket socket, int id, MultiServer multiserver) throws SQLException, IOException {
@@ -95,6 +95,14 @@ public class MultiServerThread2 extends Thread {
 
     public void setFechahora_men_leer(String fechahora_men_leer) {
         this.fechahora_men_leer = fechahora_men_leer;
+    }
+
+    public String getAmigoestado() {
+        return amigoestado;
+    }
+
+    public void setAmigoestado(String amigoestado) {
+        this.amigoestado = amigoestado;
     }
     
     
@@ -220,7 +228,22 @@ public class MultiServerThread2 extends Thread {
                     }
                     
                 
-            }
+                }
+                
+                
+                //COMPROBACION ESTADOS
+                if(this.entrada_cliente.contains("#CLIENT#STATUS#")){
+                    //1- Descifrar cadena
+                    //2- Comprobar la conexion
+                    //3- Cambiar el atributo de conexion en la bd de ese usuario
+                    //4- Mandar estado al cliente
+                    try {
+                        this.salida_server = this.protocolo.procesarEntradaEstado(this.entrada_cliente, this);
+                        this.mandar_salida(this.salida_server);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
+                    }                                        
+                }
                 
                 
                 
