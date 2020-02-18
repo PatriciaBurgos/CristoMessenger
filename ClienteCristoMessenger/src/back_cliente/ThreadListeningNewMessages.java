@@ -26,6 +26,13 @@ public class ThreadListeningNewMessages extends Thread {
     @Override
     public void run() {   
         while(listening){
+            
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
             try {
                 if((conexionCliente.fromServer = conexionCliente.in.readLine()) != null){
                     

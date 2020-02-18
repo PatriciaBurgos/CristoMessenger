@@ -210,8 +210,8 @@ public class VistaClienteLogin extends javax.swing.JFrame {
                     this.dispose();
                     VistaClienteChats vista2;
                     try {
-                        vista2 = new VistaClienteChats(cliente_conexion,array_mensajes_usuario); 
-                        vista2.label_usuario_activo.setText(user);
+                        vista2 = new VistaClienteChats(cliente_conexion,array_mensajes_usuario,user); 
+                        //vista2.label_usuario_activo.setText(user);
                         vista2.user_act = user;
                         vista2.setVisible(true);
                         vista2.getFriends(salida);

@@ -38,13 +38,14 @@ public class VistaClienteChats extends javax.swing.JFrame {
     /**
      * Creates new form Segunda_ventana
      */
-    public VistaClienteChats(ConexionClienteconServer conexion, ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario) throws SQLException {
+    public VistaClienteChats(ConexionClienteconServer conexion, ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario, String usuario) throws SQLException, IOException {
         
         setExtendedState(MAXIMIZED_BOTH);
         initComponents();
         
         this.conexionCliente = conexion;
         amigos_del_usuario_mensajes = array_mensajes_usuario;
+        this.conexionCliente.conectar_con_server_obtener_datos(usuario,this);
         
         //Registro
         user = " ";
@@ -351,7 +352,6 @@ public class VistaClienteChats extends javax.swing.JFrame {
         for (int i = 0; i<amigos.size(); i++) { 
             listModel.addElement(amigos.get(i));
             AmigosDeUnUsuario_Mensajes amigo = new AmigosDeUnUsuario_Mensajes();
-            //ESTO LO VOY A TENER QUE CAMBIAR ME LO VA A PONER CON EL ESTADO
             amigo.setId_user((String) amigos.get(i));
             this.amigos_del_usuario_mensajes.add(amigo);
         }
@@ -367,14 +367,14 @@ public class VistaClienteChats extends javax.swing.JFrame {
         //Tengo que cambiar lo de los amigos_del_usuario_mensajes
         this.conexionCliente.conectar_con_server_leer_mensajes(user_dest,amigos_del_usuario_mensajes, pos);
                
-        
         this.text_area.setText("");
-        for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){
-            this.amigos_del_usuario_mensajes.get(i).ordenar();
+        this.amigos_del_usuario_mensajes.get(pos).ordenar();
+        
+        for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){            
             this.text_area.setText(text_area.getText()+amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText()+ "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getDatetime()+"\n");            
         }
         
-        this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
+        this.conexionCliente.conectar_con_server_obtener_datos(user_dest,this);
     }
     
     public void cargar_mensajes_anteriores(String user_dest, int pos) throws IOException {
@@ -383,12 +383,13 @@ public class VistaClienteChats extends javax.swing.JFrame {
         this.conexionCliente.conectar_con_server_leer_mensajes(user_dest,amigos_del_usuario_mensajes, pos);
       
         this.text_area.setText("");
+        this.amigos_del_usuario_mensajes.get(pos).ordenar();
         for(int i = 0;i<amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++){
-            this.amigos_del_usuario_mensajes.get(i).ordenar();
-            this.text_area.setText(amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getDatetime()+"\n"+text_area.getText());            
+            
+            this.text_area.setText(this.text_area.getText() + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig()+ "-->" +amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getDatetime()+"\n");            
         }
         
-        this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
+       // this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
     }
     
     public void enviar_mensaje(String texto,int pos){
@@ -413,6 +414,17 @@ public class VistaClienteChats extends javax.swing.JFrame {
                 
             //}
         //}
+    }
+    
+    public static void actualizar_estados_vista(){
+        VistaClienteChats.list_friends.removeAll();
+        VistaClienteChats.listModel.removeAllElements();
+        
+        for (int i = 0; i<VistaClienteChats.amigos_del_usuario_mensajes.size(); i++) { 
+            listModel.addElement(amigos_del_usuario_mensajes.get(i).getId_user());
+        }
+        VistaClienteChats.list_friends.setModel(listModel);
+        
     }
     
     
@@ -467,11 +479,11 @@ public class VistaClienteChats extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JLabel label_amigo;
+    public javax.swing.JLabel label_amigo;
     private javax.swing.JLabel label_imagen_amigo;
     private javax.swing.JLabel label_imagen_user;
     public javax.swing.JLabel label_usuario_activo;
-    private javax.swing.JList<String> list_friends;
+    private static javax.swing.JList<String> list_friends;
     private javax.swing.JLabel miImagen;
     private javax.swing.JPanel panel_chat;
     private javax.swing.JTabbedPane pestañas;
@@ -490,13 +502,13 @@ public class VistaClienteChats extends javax.swing.JFrame {
     /*Chat*/
     public String user_act;
     ArrayList chat_array_friends;
-    DefaultListModel listModel;    
+    static DefaultListModel listModel;    
     String [] listData;
     MouseListener mouseListener;
     String friend_mess;
     
     ConexionClienteconServer conexionCliente;
-    ArrayList <AmigosDeUnUsuario_Mensajes> amigos_del_usuario_mensajes;
+    static ArrayList <AmigosDeUnUsuario_Mensajes> amigos_del_usuario_mensajes;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     int pos_amigo;
 }

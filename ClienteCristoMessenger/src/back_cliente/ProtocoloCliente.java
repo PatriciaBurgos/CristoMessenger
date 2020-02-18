@@ -173,8 +173,8 @@ public class ProtocoloCliente {
         return theOutput;
     }
     
-    public void procesarDatosUsuario(String salida_server){
-        
+    public String procesarDatosUsuario(String salida_server){
+        String nombreCompleto = "";
         int comprobacion = salida_server.indexOf("#ALLDATA_USER#");
     
         String cadena_mensajes = salida_server.substring(comprobacion+1);
@@ -195,7 +195,11 @@ public class ProtocoloCliente {
         String apellido2 =parts[4];
         usuario.setSurname2(apellido2);
 
-        System.out.println(usuario.toString());            
+        System.out.println(usuario.toString());    
+
+        nombreCompleto = nombre + " " + apellido1 + " " + apellido2;
+        
+        return nombreCompleto;
     }
     
     public String procesarEnviarMensaje_texto(String texto, String usuario_origen, String usuario_destino){
@@ -243,11 +247,35 @@ public class ProtocoloCliente {
         return theOutput;
     }
     
-    public String procesarEstadoUsuario(String usuario, UsuariosMapeo amigo){
+    public String procesarEstadoUsuario_enviarServer(String usuario, UsuariosMapeo amigo){
         String theOutput = null;
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String usuario_final ;
         
-        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#STATUS#"+usuario+"#"+amigo;
+        if(amigo.getId_user().contains(" --- ")){
+            int empi = amigo.getId_user().indexOf(" ---");
+            usuario_final = amigo.getId_user().substring(0, empi);
+        }else{
+            usuario_final = amigo.getId_user();
+        }
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#STATUS#"+usuario+"#"+usuario_final;
+
+        return theOutput;
+    }
+    
+    public String procesarEstadoUsuario (String entrada){
+        String theOutput = null;
+        
+        String[] parts = entrada.split("#");        
+        theOutput = parts[4]; //nom_amigo
+        
+        int comprobacion = entrada.indexOf("NOT");
+        if(comprobacion == -1){ //conectado
+            theOutput += " --- CONECTADO";
+        }else{ //no conectado
+            theOutput += " --- NO_CONECTADO";
+        }
 
         return theOutput;
     }

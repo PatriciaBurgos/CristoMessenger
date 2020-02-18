@@ -36,7 +36,11 @@ public class ThreadEstadoAmigos extends Thread{
             } catch (InterruptedException ex) {
                 Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
             }
-            conexionCliente.comprobar_estados();
+            try {
+                conexionCliente.comprobar_estados();
+            } catch (IOException ex) {
+                Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
         }
     }

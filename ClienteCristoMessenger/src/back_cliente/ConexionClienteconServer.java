@@ -48,6 +48,8 @@ public class ConexionClienteconServer {
     ThreadListeningNewMessages hebra_recibir_mensajes;
     ThreadEstadoAmigos hebra_estados;
     
+    VistaClienteChats vchats;
+    
     public ConexionClienteconServer(String IP, int port, String user, String pass, ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario) throws IOException{
         ip = IP;
         puerto = port;
@@ -62,11 +64,11 @@ public class ConexionClienteconServer {
 //        VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT:IP-->" + ip + " PUERTO--> " + puerto + " USUARIO--> " + usuario + " CONTRASEÑA--> " +contraseña+ "\n");
          
         //Creo una hebra que este escuchando por si le envían un mensaje
-        hebra_recibir_mensajes = new ThreadListeningNewMessages (this);
+//        hebra_recibir_mensajes = new ThreadListeningNewMessages (this);
+//        this.hebra_recibir_mensajes.start();
         hebra_estados = new ThreadEstadoAmigos(this);
         
-//        ThreadPeticionesUsuario hebra_peticiones_usuario = new ThreadPeticionesUsuario (this);
-//        hebra_peticiones_usuario.start();
+        hebra_estados.start();
 
         this.array_mensajes_usuario = array_mensajes_usuario;
 //        
@@ -113,11 +115,11 @@ public class ConexionClienteconServer {
             salida = protocolo.procesarSalidaLogin(fromServer);
             
             if(fromServer.contains("#SERVER#LOGIN_CORRECT#")){
-                this.hebra_recibir_mensajes.start();
+                //this.hebra_recibir_mensajes.start();
                 //PONER UN IF POR SI NO TENGO AMIGOS
                 //ACTUALIZAR LA VISTA CUANDO ACTUALICE
                 //VER EL ERROR QUE ME DA
-                this.hebra_estados.start();
+//                this.hebra_estados.start();
             }
             
         }        
@@ -160,7 +162,7 @@ public class ConexionClienteconServer {
     
     }
     
-    public void conectar_con_server_obtener_datos(String nom_user) throws IOException{
+    public void conectar_con_server_obtener_datos(String nom_user, VistaClienteChats vchats) throws IOException{
         //1- Llamar al protocolo para hacer la cadena
         fromUser = this.protocolo.procesarTodosLosDatos_Usuario(nom_user);
         
@@ -168,9 +170,14 @@ public class ConexionClienteconServer {
         this.pedir_al_server_datos_usuario();
         
         //3- El server nos devuelve la cadena con los datos del usuario y lo mandamos al protocolo
-        this.procesar_entrada_server_datos();
+        String nombreCompleto = this.procesar_entrada_server_datos();
         
         //4- Guardamos en el array los datos(Es una opcion)
+        if(nom_user.equals(usuario)){
+            vchats.label_usuario_activo.setText(nombreCompleto);
+        }else{
+            vchats.label_amigo.setText(nombreCompleto);
+        }
         
     }
     
@@ -251,12 +258,14 @@ public class ConexionClienteconServer {
         }
     }
     
-    public void procesar_entrada_server_datos() throws IOException{
+    public String procesar_entrada_server_datos() throws IOException{
+        String nombreCompleto = "";
         if((fromServer = in.readLine()) != null){
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-            protocolo.procesarDatosUsuario(fromServer);   
+            nombreCompleto = protocolo.procesarDatosUsuario(fromServer);   
         }
+        return nombreCompleto;
     }
     
     public void enviar_al_server_texto_mensaje (){
@@ -288,9 +297,10 @@ public class ConexionClienteconServer {
         }
     }
     
-    synchronized public void comprobar_estados(){
+    public void comprobar_estados() throws IOException{
+        String estado;
         for(int i= 0; i<this.array_mensajes_usuario.size();i++){
-            this.protocolo.procesarEstadoUsuario(this.usuario,this.array_mensajes_usuario.get(i));
+            fromUser = this.protocolo.procesarEstadoUsuario_enviarServer(this.usuario,this.array_mensajes_usuario.get(i));
             //ENVIO AL SERVIDOR
             if (fromUser != null) {
                 System.out.println("CLIENT TO SERVER: " + fromUser);
@@ -299,11 +309,14 @@ public class ConexionClienteconServer {
             }
             
             //RECIVO DEL SERVIDOR
-            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-            //Guardo el mensaje y hago la cadena para enviarla al server
-            fromUser = protocolo.procesarMensajeNuevo(fromServer,this.array_mensajes_usuario);
-        }
+            if((fromServer = in.readLine()) != null){
+                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+                estado = protocolo.procesarEstadoUsuario(fromServer);   
+                this.array_mensajes_usuario.get(i).setId_user(estado);
+            }
+        }    
+        VistaClienteChats.actualizar_estados_vista();
     }
     
 }   
