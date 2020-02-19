@@ -272,6 +272,40 @@ public class ProtocoloServer {
         return theOutput;
     }
     
+    public String procesarEntradaObtenerFoto(String entrada){        
+        String[] parts = entrada.split("#");
+        String login = parts[4];
+        return login;
+    }
+    
+    public String procesarSalidaNotificarEnvioFoto(String usuario){
+        String theOutput = "";
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#STARTING_MULTIMEDIA_TRANSMISSION_TO#"+usuario;
+        
+        return theOutput;
+    }
+    
+    public String procesarFotoMandarACliente(byte[] buffer, String usuario, int total_bytes){
+        String theOutput = "";
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        //Conversion de bytes a string
+        String string_buffer = new String(buffer);
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#RESPONSE_MULTIMEDIA#"+usuario+"#512#"+total_bytes+"#"+string_buffer;
+        
+        return theOutput;
+    }
+    
+    public String procesarSalidaNotificarFinFoto(String login){
+        String theOutput = "";
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#"+login;
+        
+        return theOutput;
+    }
     
 }
 

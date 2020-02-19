@@ -279,4 +279,11 @@ public class ProtocoloCliente {
 
         return theOutput;
     }
+    
+    public String procesarObtenerFoto(String login){
+        String theOutput = "";
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#GET_PHOTO#"+login;
+        return theOutput;
+    }
 }

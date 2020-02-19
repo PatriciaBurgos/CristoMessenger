@@ -78,4 +78,9 @@ public class ControladorUsuario {
         usuario_modelo.changestatus(usuario, check);
     }
     
+    public String obtenerRutaFoto(String login) throws SQLException{
+        String ruta = this.usuario_modelo.get_data_photo(login);
+        return ruta;
+    }
+    
 }

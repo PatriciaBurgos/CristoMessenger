@@ -319,6 +319,34 @@ public class ConexionClienteconServer {
         VistaClienteChats.actualizar_estados_vista();
     }
     
+    public void obtenerFoto(String login) throws IOException{
+        //1- Llamo al método del protocolo para que me convierta la cadena
+        this.fromUser = protocolo.procesarObtenerFoto(login);
+        //2-Envio la cadena al server
+        //ENVIO AL SERVIDOR
+        if (fromUser != null) {
+            System.out.println("CLIENT TO SERVER: " + fromUser);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+            out.println(fromUser); //Envia por el socket            
+        }
+        //3-Recivo del servidor que me va a empezar a mandar los bytes de la foto
+        //RECIVO DEL SERVIDOR
+        if((fromServer = in.readLine()) != null){
+            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+        }
+        if(fromServer.contains("#SERVER#STARTING_MULTIMEDIA_TRANSMISSION_TO#")){
+            //4-Voy a empezar a recivir los bytes en forma de protocolo. Mandar al protocolo
+            
+            //5-Decodificar los bytes de la cadena
+            
+            //6-Guardarlos en memoria local
+            
+            
+        }
+        
+    }
+    
 }   
     
     

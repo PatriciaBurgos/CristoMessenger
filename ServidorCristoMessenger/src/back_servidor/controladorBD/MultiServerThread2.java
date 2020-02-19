@@ -9,12 +9,15 @@ import back_servidor.MultiServer;
 import back_servidor.modeloBD.MensajesMapeo;
 import front_servidor.VistaServer;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -246,6 +249,24 @@ public class MultiServerThread2 extends Thread {
                 }
                 
                 
+                //COMPROBACION OBTENER FOTO
+                if(this.entrada_cliente.contains("#CLIENT#GET_PHOTO#")){
+                    //1-Descrifrar cadena y sacar el login
+                    String login_foto = this.protocolo.procesarEntradaObtenerFoto(this.entrada_cliente);
+                    //2-Notificar al cliente que se va a empezar a mandar la foto
+                    this.salida_server = this.protocolo.procesarSalidaNotificarEnvioFoto(login_foto);
+                    this.mandar_salida(this.salida_server);
+                    try {
+                        //3-Llamo a un método para traerme la foto
+                        this.obtener_paquetes_foto(login_foto);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+                //EL CLIENTE ME VA A MANDAR OTRO CODIGO DISTINTO CON LA FOTO
                 
                 
                 
@@ -341,6 +362,31 @@ public class MultiServerThread2 extends Thread {
         if(check){
             this.multiServer.acceder_a_hebra_y_mandar_mensaje(this.usuario_destino, salida);
         }
+    }
+    
+    public void obtener_paquetes_foto(String login) throws SQLException, FileNotFoundException, IOException{     
+        //1-Llamar al controlador para traerme la ruta de la foto
+        String rutaFoto = this.controladorUsuario.obtenerRutaFoto(login);
+        //2-Extraer bytes con file input stream en un buffer de array de 512bytes
+        FileInputStream fileInputStream  = new FileInputStream(rutaFoto);
+        byte buffer[] = new byte[512];
+        int off = 0;
+        int len = 512;
+        
+        do{
+            fileInputStream.read(buffer, off, len);
+            //3-Encode
+            Base64.getEncoder().encode(buffer);            
+            //4-Hacer cadena con el protocolo
+            this.salida_server = this.protocolo.procesarFotoMandarACliente(buffer, login, len);
+            //5-Manda al cliente
+            this.mandar_salida(this.salida_server);            
+        }while(len!=0);
+        
+        //3-Mandar al cliente que ya se ha terminado la cadena
+        this.salida_server = this.protocolo.procesarSalidaNotificarFinFoto(login);
+        this.mandar_salida(this.salida_server);
+        
     }
     
     public void desconectar (){
