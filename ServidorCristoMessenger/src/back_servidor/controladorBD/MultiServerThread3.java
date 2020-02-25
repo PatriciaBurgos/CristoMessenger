@@ -127,12 +127,13 @@ public class MultiServerThread3 extends Thread {
         do{
             fileInputStream.read(buffer, off, len);
             //3-Encode (PUEDE QUE ME FALLE AQUI)
-            Base64.getEncoder().encode(buffer);            
+            String encodedString = Base64.getEncoder().encodeToString(buffer);
+//            Base64.getEncoder().encode(buffer);            
             //4-Hacer cadena con el protocolo
-            this.salida_server = this.protocolo.procesarFotoMandarACliente(buffer, login, len);
+            this.salida_server = this.protocolo.procesarFotoMandarACliente(encodedString, login, len);
             //5-Manda al cliente
             this.mandar_salida(this.salida_server);            
-        }while(len!=0);
+        }while(len!=512);
         
         //3-Mandar al cliente que ya se ha terminado la cadena
         this.salida_server = this.protocolo.procesarSalidaNotificarFinFoto(login);

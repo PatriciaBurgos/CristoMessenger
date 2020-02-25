@@ -7,6 +7,7 @@ package back_cliente;
 
 import front_cliente.VistaClienteChats;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -168,7 +169,10 @@ public class ConexionClienteconServer2 {
             }
         }while(this.num_men_dia==0 && this.num_men_totales!=0 && this.array_mensajes_usuario.get(pos).getNum_men_recibidos() != this.num_men_totales);
        
-        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(auxDate1);
+        //QUE ME GUARDE LA ULTIMA FECHA, SINO HACER UN METODO QUE SI NO HAY MENSAJES ME DE LA FECHA ACTUAL Y SINO QUE ME BUSQUE LA ULTIMA
+        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(this.array_mensajes_usuario.get(pos).mensajes_array.get(this.array_mensajes_usuario.get(pos).mensajes_array.size()-1).getDatetime());
+        
+//        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(auxDate1);
         
         contador--;
         notifyAll();
@@ -384,7 +388,9 @@ public class ConexionClienteconServer2 {
         //RECIVO DEL SERVIDOR
         
         String ruta = "imagenes/"+login+".jpg";
-        FileOutputStream ficheroSalida = new FileOutputStream(ruta);
+        File file = new File(ruta);
+        file.createNewFile();
+        FileOutputStream ficheroSalida = new FileOutputStream(file);
         byte buffer[] = new byte[512];
         int off = 0;
         
@@ -403,8 +409,13 @@ public class ConexionClienteconServer2 {
             if(!salidaFoto.equals("")){
                 this.mandarSalida(salidaFoto);
             }
+            if(fromServer.contains("#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#")){
+                break;
+            }
         
         }
+        ficheroSalida.flush();
+        ficheroSalida.close();
         contador--;
         notifyAll();
         

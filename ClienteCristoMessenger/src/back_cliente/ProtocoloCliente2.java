@@ -363,14 +363,13 @@ public class ProtocoloCliente2 {
         
         if(entrada.contains("#SERVER#RESPONSE_MULTIMEDIA#")){
             String[] parts = entrada.split("#");
-            int tamanio = Integer.valueOf(parts[6]);
             String encodeCadena = parts[7];
             
-            buffer = Base64.getDecoder().decode(encodeCadena);
-            //NO SE SI SE VA A SOBREESCRIBIR EL ARCHIVO EN VEZ DE COPIAR DEJANDO LO QUE HAY
+            String s = new String(Base64.getDecoder().decode(encodeCadena));
             
-            
-            ficheroSalida.write(buffer,off,tamanio);
+            for (char c : s.toCharArray()) {
+                ficheroSalida.write(c);//char 
+            }
             
         }
         

@@ -449,13 +449,11 @@ public class ProtocoloServer2 {
         return theOutput;
     }
     
-    public String procesarFotoMandarACliente(byte[] buffer, String usuario, int total_bytes){
+    public String procesarFotoMandarACliente(String encode, String usuario, int total_bytes){
         String theOutput = "";
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        //Conversion de bytes a string
-        String string_buffer = new String(buffer);
         
-        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#RESPONSE_MULTIMEDIA#"+usuario+"#512#"+total_bytes+"#"+string_buffer;
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#RESPONSE_MULTIMEDIA#"+usuario+"#512#"+total_bytes+"#"+encode;
         
         return theOutput;
     }
