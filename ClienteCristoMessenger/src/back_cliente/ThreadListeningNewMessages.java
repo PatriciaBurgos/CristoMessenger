@@ -15,10 +15,10 @@ import java.util.logging.Logger;
  * @author patri
  */
 public class ThreadListeningNewMessages extends Thread {
-    ConexionClienteconServer conexionCliente;
+    ConexionClienteconServer2 conexionCliente;
     boolean listening;
     
-    public ThreadListeningNewMessages(ConexionClienteconServer conexion_cliente) {
+    public ThreadListeningNewMessages(ConexionClienteconServer2 conexion_cliente) {
         this.conexionCliente = conexion_cliente;     
         listening=true;
     }
@@ -27,22 +27,26 @@ public class ThreadListeningNewMessages extends Thread {
     public void run() {   
         while(listening){
             
-            try {
-                Thread.sleep(15000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            try {
-                if((conexionCliente.fromServer = conexionCliente.in.readLine()) != null){
-                    
-                    if(conexionCliente.fromServer.contains("#SERVER#CHAT#") && !conexionCliente.fromServer.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
-                        conexionCliente.recivo_mensaje();
-                    }
-                }
-            } catch (IOException ex) { 
-                Logger.getLogger(ThreadListeningNewMessages.class.getName()).log(Level.SEVERE, null, ex);
-            }
+//            try {
+//                Thread.sleep(20000);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            
+//            try {
+//                if((conexionCliente.fromServer = conexionCliente.in.readLine()) != null){
+//                    
+//                    if(conexionCliente.fromServer.contains("#SERVER#CHAT#") && !conexionCliente.fromServer.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
+//                        try {
+//                            conexionCliente.recibo_mensaje();
+//                        } catch (InterruptedException ex) {
+//                            Logger.getLogger(ThreadListeningNewMessages.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
+//                    }
+//                }
+//            } catch (IOException ex) { 
+//                Logger.getLogger(ThreadListeningNewMessages.class.getName()).log(Level.SEVERE, null, ex);
+//            }
         }
     }
     

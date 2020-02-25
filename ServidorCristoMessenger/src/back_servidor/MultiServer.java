@@ -19,7 +19,7 @@ public class MultiServer {
     
     int puerto;
     boolean listening;
-    ArrayList <MultiServerThread2> hebras_array;
+    ArrayList <MultiServerThread3> hebras_array;
     
     public MultiServer(int port) throws SQLException{
         hebras_array = new ArrayList();
@@ -32,7 +32,7 @@ public class MultiServer {
         try (ServerSocket serverSocket = new ServerSocket(puerto)) { 
             int i = 0;
             while(listening) {                   
-                MultiServerThread2 hebra = new MultiServerThread2 (serverSocket.accept(),i,this);
+                MultiServerThread3 hebra = new MultiServerThread3 (serverSocket.accept(),i,this);
                 hebras_array.add(hebra);
                 System.out.println("SERVER: AÑADO HEBRA");
                 VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: AÑADO HEBRA" + "\n");
@@ -61,10 +61,9 @@ public class MultiServer {
     public boolean buscar_en_hebras_conectadas (String nombre){
         boolean check = false;
         for(int i = 0; i<this.hebras_array.size(); i++){
-            System.out.println("nombre = " + this.hebras_array.get(i).getName());
             if(this.hebras_array.get(i).getName().equals(nombre)){
                 check = true;
-                System.out.println("ENTRA");
+                System.out.println("ENTRA; Tengo una hebra conectada");
             }
         }
         return check;

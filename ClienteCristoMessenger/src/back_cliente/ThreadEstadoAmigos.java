@@ -20,10 +20,10 @@ import java.util.logging.Logger;
  */
 
 public class ThreadEstadoAmigos extends Thread{
-    ConexionClienteconServer conexionCliente;
+    ConexionClienteconServer2 conexionCliente;
     boolean listening;
     
-    public ThreadEstadoAmigos(ConexionClienteconServer conexion_cliente) {
+    public ThreadEstadoAmigos(ConexionClienteconServer2 conexion_cliente) {
         this.conexionCliente = conexion_cliente;     
         listening=true;
     }
@@ -32,12 +32,16 @@ public class ThreadEstadoAmigos extends Thread{
     public void run() {   
         while(listening){
             try {
-                Thread.sleep(15000);
+                Thread.sleep(30000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                conexionCliente.comprobar_estados();
+                try {
+                    conexionCliente.comprobar_estados();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } catch (IOException ex) {
                 Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
             }

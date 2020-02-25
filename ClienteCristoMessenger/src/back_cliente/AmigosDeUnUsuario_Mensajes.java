@@ -20,6 +20,7 @@ import java.util.Comparator;
  */
 public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
     public ArrayList<MensajesMapeo> mensajes_array;
+    String nombreCompleto;
     int num_amigos;
     String ultima_fecha_buscada;
     int num_men_recibidos;
@@ -52,9 +53,15 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
         this.num_men_recibidos = num_men_recibidos;
     }
 
-//    public void ordenar(){
-//        Arrays.sort(this.mensajes_array);
-//    }
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    
     
     public void ordenar(){
         System.out.println("ORDENAR LOS MENSAJES");

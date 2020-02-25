@@ -6,7 +6,7 @@
 package front_cliente;
 
 import back_cliente.AmigosDeUnUsuario_Mensajes;
-import back_cliente.ConexionClienteconServer;
+import back_cliente.ConexionClienteconServer2;
 import java.awt.Image;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -185,10 +185,11 @@ public class VistaClienteLogin extends javax.swing.JFrame {
             System.out.println("CLIENT: conectando....");
 //            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT: CONECTANDO..." + "\n");
         
-            ConexionClienteconServer cliente_conexion;
+            ConexionClienteconServer2 cliente_conexion;
             try {
-                cliente_conexion = new ConexionClienteconServer(this.textIP.getText(), Integer.valueOf(this.textPuerto.getText()), user, clave_password,array_mensajes_usuario);
+                cliente_conexion = new ConexionClienteconServer2(this.textIP.getText(), Integer.valueOf(this.textPuerto.getText()), user, clave_password,array_mensajes_usuario);
                 salida = cliente_conexion.conectar_con_server_login();
+                
                 int comprobar_error = salida.get(0).indexOf("BAD_LOGIN");
             
                 if(comprobar_error != -1){
@@ -222,6 +223,8 @@ public class VistaClienteLogin extends javax.swing.JFrame {
                 }
             
             } catch (IOException ex) {
+                Logger.getLogger(VistaClienteLogin.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
                 Logger.getLogger(VistaClienteLogin.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

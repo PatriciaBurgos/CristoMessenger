@@ -67,11 +67,11 @@ public class ModeloMensajes extends BDConnector{
     }
     
     public void query_messages_change_send(String usuario, String amigo, String fecha){
-        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET sent = 1 WHERE id_user_orig = '"+usuario+"' and id_user_dest = '"+amigo+"' and datetime = '"+fecha+"';");
+        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET sent = 1 WHERE ((id_user_orig = '"+usuario+"' and id_user_dest = '"+amigo+"') and datetime = '"+fecha+"');");
     }
     
     public void query_messages_change_read(String usuario, String amigo, String fecha){
-        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET read_msg = 1 WHERE id_user_orig = '"+usuario+"' and id_user_dest = '"+amigo+"' and datetime = '"+fecha+"';");
+        this.setQuery("UPDATE "+ get_dbname() + "." + getTabladb()+" SET read_msg = 1 WHERE ((id_user_orig = '"+usuario+"' and id_user_dest = '"+amigo+"') and datetime = '"+fecha+"');");
     }
 
     public void get_messages(String db, String table, ArrayList mess, String usuario, String amigo, String fecha) throws SQLException {
@@ -87,6 +87,9 @@ public class ModeloMensajes extends BDConnector{
             this.set_rs(this.get_stmt().executeQuery(getQuery()));
             
             while (get_rs().next()) {
+                
+//                this.change_boolean_read(db, table, usuario, amigo, fecha);
+//                this.change_boolean_send(db, table, usuario, amigo, fecha);
                 
                 String id_user_orig = get_rs().getString("id_user_orig");
                 String id_user_dest = get_rs().getString("id_user_dest");

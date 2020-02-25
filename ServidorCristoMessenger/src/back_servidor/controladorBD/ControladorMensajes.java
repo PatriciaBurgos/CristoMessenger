@@ -41,9 +41,14 @@ public class ControladorMensajes {
         return num;    
     }
     
-    public void get_message_send(String usuario, String amigo, ArrayList mensajes, String fecha) throws SQLException{
+    public void get_message_send(String usuario, String amigo, ArrayList<MensajesMapeo> mensajes, String fecha) throws SQLException{
         //Aqui me voy a traer todos los mensajes y los voy a mandar uno a uno+       
-        this.message.get_messages(this.message.get_dbname(), this.message.getTabladb(),mensajes, usuario, amigo, fecha);   
+        this.message.get_messages(this.message.get_dbname(), this.message.getTabladb(),mensajes, usuario, amigo, fecha); 
+        for(int i = 0; i<mensajes.size();i++){
+            //Pongo primero el amigo porque es el que menada el mensaje
+            this.change_boolean_send(amigo, usuario, mensajes.get(i).getDatetime());
+            this.change_boolean_read(amigo, usuario, mensajes.get(i).getDatetime());
+        }
     }
     
     public void save_message(String usuario, String amigo, String texto, String fechahora) throws SQLException{
