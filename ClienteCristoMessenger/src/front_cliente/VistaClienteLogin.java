@@ -217,6 +217,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
                         vista2.setVisible(true);
                         vista2.getFriends(salida);
                         this.setVisible(false);
+                        cliente_conexion.vchats = vista2;
                     } catch (SQLException ex) {
                         Logger.getLogger(VistaClienteLogin.class.getName()).log(Level.SEVERE, null, ex);
                     }

@@ -40,11 +40,10 @@ public class ConexionClienteconServer2 {
     
     ArrayList<AmigosDeUnUsuario_Mensajes> array_mensajes_usuario;
     
-    ThreadListeningNewMessages hebra_recibir_mensajes;
     ThreadEstadoAmigos hebra_estados;
     ThreadEntradaDelServer hebra_entrada;
     
-    VistaClienteChats vchats;
+    public VistaClienteChats vchats;
     String amigo;
     Lock mutex;
     Condition vacio, lleno;
@@ -78,6 +77,7 @@ public class ConexionClienteconServer2 {
         mutex = new ReentrantLock();
         vacio = mutex.newCondition();
         lleno = mutex.newCondition();
+        
 //        
     }
 
@@ -117,19 +117,13 @@ public class ConexionClienteconServer2 {
         }
 
         //Me lo envía el servidor (2)
-        if((fromServer = in.readLine()) != null){
-            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-            salida = protocolo.procesarSalidaLogin(fromServer);
-//            
-////            if(fromServer.contains("#SERVER#LOGIN_CORRECT#")){
-//                //this.hebra_recibir_mensajes.start();
-//                //PONER UN IF POR SI NO TENGO AMIGOS
-//                //ACTUALIZAR LA VISTA CUANDO ACTUALICE
-//                //VER EL ERROR QUE ME DA
-////                this.hebra_estados.start();
-////            }            
-//            
-        }      
+        do{
+            if(!(fromServer = in.readLine()).equals("")){
+                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                salida = protocolo.procesarSalidaLogin(fromServer);
+
+            }  
+        }while(fromServer.equals(""));
         contador--;
         notifyAll();
         return salida;
@@ -170,9 +164,9 @@ public class ConexionClienteconServer2 {
         }while(this.num_men_dia==0 && this.num_men_totales!=0 && this.array_mensajes_usuario.get(pos).getNum_men_recibidos() != this.num_men_totales);
        
         //QUE ME GUARDE LA ULTIMA FECHA, SINO HACER UN METODO QUE SI NO HAY MENSAJES ME DE LA FECHA ACTUAL Y SINO QUE ME BUSQUE LA ULTIMA
-        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(this.array_mensajes_usuario.get(pos).mensajes_array.get(this.array_mensajes_usuario.get(pos).mensajes_array.size()-1).getDatetime());
+//        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(this.array_mensajes_usuario.get(pos).mensajes_array.get(this.array_mensajes_usuario.get(pos).mensajes_array.size()-1).getDatetime());
         
-//        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(auxDate1);
+        this.array_mensajes_usuario.get(pos).setUltima_fecha_buscada(auxDate1);
         
         contador--;
         notifyAll();
@@ -239,21 +233,23 @@ public class ConexionClienteconServer2 {
     }
     
     public void procesar_entrada_server_numero_mensajes() throws IOException{
-        if((fromServer = in.readLine()) != null){
-            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-            
-            num_men_totales=0;
-            num_men_dia = 0;
+        do{
+            if(!(fromServer = in.readLine()).equals("")){
+                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
 
-            //Aqui solo saco los numeros de las conversaciones
-            protocolo.procesarConversacion_Numero(fromServer, num_men_totales,num_men_dia);
-        }
+                num_men_totales=0;
+                num_men_dia = 0;
+
+                //Aqui solo saco los numeros de las conversaciones
+                protocolo.procesarConversacion_Numero(fromServer, num_men_totales,num_men_dia);
+            }
+        }while(fromServer.equals(""));
     }
     
     public void enviar_al_server_ok_send(){
         fromUser = protocolo.procesarConversacion_ok_send();
-        if (fromUser != null) {
+        if (fromUser != "") {
             System.out.println("CLIENT TO SERVER: " + fromUser);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
             out.println(fromUser); //Envia por el socket            
@@ -269,11 +265,13 @@ public class ConexionClienteconServer2 {
         //Me traigo los mensajes de un usuario en una fecha
         for(int i=0; i<this.num_men_dia; i++){
             //Si me envía algún mensaje
-            if((fromServer = in.readLine()) != null){
-                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-                protocolo.procesarConversacion_Mensajes(fromServer, this.array_mensajes_usuario.get(pos).mensajes_array, num_men_totales);   
-            }
+            do{
+                if((fromServer = in.readLine()) != null){
+                    System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                    VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+                    protocolo.procesarConversacion_Mensajes(fromServer, this.array_mensajes_usuario.get(pos).mensajes_array, num_men_totales);   
+                }
+            }while(fromServer.equals(""));
             this.array_mensajes_usuario.get(pos).num_men_recibidos++;
         }    
         contador--;
@@ -299,16 +297,18 @@ public class ConexionClienteconServer2 {
     
     public String procesar_entrada_server_datos() throws IOException{
         String nombreCompleto = "";
-        if((fromServer = in.readLine()) != null){
-            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-            nombreCompleto = protocolo.procesarDatosUsuario(fromServer);   
-        }
+        do{
+            if(!(fromServer = in.readLine()).equals("")){
+                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+                nombreCompleto = protocolo.procesarDatosUsuario(fromServer);   
+            }
+        }while(fromServer.equals(""));
         return nombreCompleto;
     }
     
     public void enviar_al_server_texto_mensaje (){
-        if (fromUser != null) {
+        if (!fromUser.equals("")) {
             System.out.println("CLIENT TO SERVER: " + fromUser);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
             out.println(fromUser); //Envia por el socket            
@@ -316,6 +316,7 @@ public class ConexionClienteconServer2 {
     }
     
     synchronized public void recibo_mensaje() throws InterruptedException{
+        //NO ENTRO AQUI
         while(contador == 0){
             wait();
         }
@@ -325,14 +326,9 @@ public class ConexionClienteconServer2 {
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
             //Guardo el mensaje y hago la cadena para enviarla al server
-            fromUser = protocolo.procesarMensajeNuevo(fromServer,this.array_mensajes_usuario);
+            protocolo.procesarEntradaServer(fromServer);
             
-            //ENVIO AL SERVIDOR
-            if (fromUser != null) {
-                System.out.println("CLIENT TO SERVER: " + fromUser);
-                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
-                out.println(fromUser); //Envia por el socket            
-            }
+            
 
         }else{
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
@@ -351,19 +347,26 @@ public class ConexionClienteconServer2 {
         for(int i= 0; i<this.array_mensajes_usuario.size();i++){
             fromUser = this.protocolo.procesarEstadoUsuario_enviarServer(this.usuario,this.array_mensajes_usuario.get(i));
             //ENVIO AL SERVIDOR
-            if (fromUser != null) {
+            if (!fromUser.equals("")) {
                 System.out.println("CLIENT TO SERVER: " + fromUser);
                 VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
                 out.println(fromUser); //Envia por el socket            
             }
             
-            //RECIVO DEL SERVIDOR
-            if((fromServer = in.readLine()) != null){
-                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-                estado = protocolo.procesarEstadoUsuario(fromServer);   
-                this.array_mensajes_usuario.get(i).setId_user(estado);
-            }
+            //RECIBO DEL SERVIDOR
+            do{
+                if(!(fromServer = in.readLine()).equals("")){
+                    System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                    VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+
+                    if(fromServer.contains("#STATUS#")){                    
+                        estado = protocolo.procesarEstadoUsuario(fromServer);   
+                        this.array_mensajes_usuario.get(i).setId_user(estado);
+                    }else{ //AÑADIR EL MENSAJE AL ARRAY Y ACTUALIZAR VENTANA
+                        this.recibo_mensaje();
+                    }
+                }
+            }while(fromServer.equals(""));
         }    
         VistaClienteChats.actualizar_estados_vista();
         contador--;
@@ -379,7 +382,7 @@ public class ConexionClienteconServer2 {
         this.fromUser = protocolo.procesarObtenerFoto(login);
         //2-Envio la cadena al server
         //ENVIO AL SERVIDOR
-        if (fromUser != null) {
+        if (!fromUser.equals("")) {
             System.out.println("CLIENT TO SERVER: " + fromUser);
             VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
             out.println(fromUser); //Envia por el socket            
@@ -394,26 +397,32 @@ public class ConexionClienteconServer2 {
         byte buffer[] = new byte[512];
         int off = 0;
         
-        while((fromServer = in.readLine()) != null){
-            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
-        
-//        if(fromServer.contains("#SERVER#STARTING_MULTIMEDIA_TRANSMISSION_TO#")){
-            //4-Voy a empezar a recivir los bytes en forma de protocolo. Mandar al protocolo
-            off+=512;
-            String salidaFoto = this.protocolo.procesarFoto(fromServer,ficheroSalida,buffer,off);
-            //5-Decodificar los bytes de la cadena
-            
-            //6-Guardarlos en memoria local
-//        }
-            if(!salidaFoto.equals("")){
-                this.mandarSalida(salidaFoto);
+        do{         
+            while(!(fromServer = in.readLine()).equals("")){
+                System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+
+    //        if(fromServer.contains("#SERVER#STARTING_MULTIMEDIA_TRANSMISSION_TO#")){
+                //4-Voy a empezar a recivir los bytes en forma de protocolo. Mandar al protocolo
+                off+=512;
+                String salidaFoto = this.protocolo.procesarFoto(fromServer,ficheroSalida,buffer,off);
+                //5-Decodificar los bytes de la cadena
+
+                //6-Guardarlos en memoria local
+    //        }
+
+                //ME FALTA MANDAR EL ULTIMO MENSAJE DE LA FOTO. DIVIDIR LOS METODOS Y PONER EL MANDAR SALIDA ANTES DEL BREAK
+                if(!salidaFoto.equals("")){
+                   // this.mandarSalida(salidaFoto);
+                }
+                if(fromServer.contains("#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#")){
+                    String sali  = this.protocolo.procesarFotoUltimoMensaje(fromServer);
+                    this.mandarSalida(sali);
+                    break;
+                }
             }
-            if(fromServer.contains("#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#")){
-                break;
-            }
+        }while(fromServer.equals(""));
         
-        }
         ficheroSalida.flush();
         ficheroSalida.close();
         contador--;
@@ -449,11 +458,11 @@ public class ConexionClienteconServer2 {
 //        notifyAll();
 //    }
     
-    public void mandarSalida (String Salida){
-        if (fromUser != null) {
-            System.out.println("CLIENT TO SERVER: " + fromUser);
-            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
-            out.println(fromUser); //Envia por el socket            
+    public void mandarSalida (String salida){
+        if (salida != null) {
+            System.out.println("CLIENT TO SERVER: " + salida);
+            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + salida+ "\n");
+            out.println(salida); //Envia por el socket            
         }
     }
     

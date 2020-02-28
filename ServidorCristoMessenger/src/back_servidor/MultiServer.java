@@ -69,9 +69,9 @@ public class MultiServer {
         return check;
     }
     
-    public void acceder_a_hebra_y_mandar_mensaje(String nombre,String salida){
+    public void acceder_a_hebra_y_mandar_mensaje(String nombre,String salida) throws InterruptedException{        
         for(int i = 0; i<this.hebras_array.size(); i++){
-            if(this.hebras_array.get(i).getName().equals(nombre)){
+            if(this.hebras_array.get(i).getName().equals(nombre)){                
                 this.hebras_array.get(i).mandar_salida(salida);
             }
         }

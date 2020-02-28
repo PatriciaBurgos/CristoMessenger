@@ -191,30 +191,31 @@ public class VistaClienteChats extends javax.swing.JFrame {
                         .addComponent(miImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(label_imagen_amigo, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                            .addComponent(label_imagen_user, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(label_usuario_activo, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(label_amigo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(label_imagen_user, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                            .addComponent(label_imagen_amigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(label_usuario_activo, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                            .addComponent(label_amigo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addGap(43, 43, 43))
         );
         panel_chatLayout.setVerticalGroup(
             panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_chatLayout.createSequentialGroup()
-                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGap(49, 49, 49)
+                .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panel_chatLayout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(label_usuario_activo)
                             .addComponent(miImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(label_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_chatLayout.createSequentialGroup()
-                        .addComponent(label_imagen_user, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(label_imagen_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(39, 39, 39)
+                        .addComponent(label_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(39, 39, 39))
+                    .addGroup(panel_chatLayout.createSequentialGroup()
+                        .addComponent(label_imagen_user, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(label_imagen_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)))
                 .addGroup(panel_chatLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_chatLayout.createSequentialGroup()
                         .addComponent(scroll, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -224,7 +225,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
                             .addComponent(boton_envio_mensajes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)
                             .addComponent(cargar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pestañas.addTab("CHAT", panel_chat);
@@ -246,7 +247,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -298,6 +299,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
     private void list_friendsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_friendsMouseClicked
         this.seleccionar_amigo(evt);
         try {
+            this.fotoAmigo();
             this.get_messages_friend(label_amigo.getText(), pos_amigo);
             //this.conexionCliente.esperar_mensaje();
         } catch (IOException ex) {
@@ -435,14 +437,31 @@ public class VistaClienteChats extends javax.swing.JFrame {
     }
 
     public void nuevo_mensaje(String amigo) {
-        if (amigo.equals(this.friend_mess)) {
-            this.text_area.setText(this.text_area.getText() + this.friend_mess + "-->" + amigos_del_usuario_mensajes.get(this.pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getDatetime() + "\n");
+//        if (amigo.equals(this.friend_mess)) {
+//            this.text_area.setText(this.text_area.getText() + this.friend_mess + "-->" + amigos_del_usuario_mensajes.get(this.pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getDatetime() + "\n");
+//        }
+        if(this.amigos_del_usuario_mensajes.get(pos_amigo).getId_user().equals(this.label_amigo.getText())){
+            this.text_area.setText("");
+            this.amigos_del_usuario_mensajes.get(pos_amigo).ordenar();
+            for (int i = 0; i < amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size(); i++) {
+                this.text_area.setText(this.text_area.getText() + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getId_user_orig() + "-->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getDatetime() + "\n");
+            }
         }
     }
     
     public String traeFoto(String usuario) throws IOException, InterruptedException{
         String ruta = this.conexionCliente.obtenerFoto(usuario);
         return ruta;
+    }
+    
+    public void fotoAmigo() throws IOException, InterruptedException{
+        int empi = this.label_amigo.getText().indexOf(" ---");
+        String amigo = this.label_amigo.getText().substring(0, empi);
+        String rutaUser = this.traeFoto(amigo);
+        ImageIcon foto1 = new ImageIcon(rutaUser);
+        Icon icono3 = new ImageIcon(foto1.getImage().getScaledInstance(label_imagen_amigo.getWidth(), label_imagen_amigo.getHeight(), Image.SCALE_DEFAULT));
+        label_imagen_amigo.setIcon(icono3);
+        this.repaint();
     }
     
 

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -23,7 +24,7 @@ public class ProtocoloServer2 {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String salida,usuario,amigo,fechahora_men_leer,entrada_cliente;
     public int num_men_fecha;
-    int contador;
+    public int contador;
     
     ProtocoloServer2(MultiServerThread3 hebra){
         this.hebra = hebra;
@@ -449,11 +450,11 @@ public class ProtocoloServer2 {
         return theOutput;
     }
     
-    public String procesarFotoMandarACliente(String encode, String usuario, int total_bytes){
+    public String procesarFotoMandarACliente(ArrayList<String> encodeLines, String usuario, int total_bytes, int total){
         String theOutput = "";
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         
-        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#RESPONSE_MULTIMEDIA#"+usuario+"#512#"+total_bytes+"#"+encode;
+        theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#RESPONSE_MULTIMEDIA#"+usuario+"#"+total+"#"+total_bytes+"#"+encodeLines.get(0).toString();
         
         return theOutput;
     }

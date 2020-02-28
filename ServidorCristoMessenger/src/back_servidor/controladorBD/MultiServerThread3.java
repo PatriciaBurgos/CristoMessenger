@@ -34,7 +34,7 @@ public class MultiServerThread3 extends Thread {
     ControladorAmigos controladorAmigos;
     ControladorMensajes controladorMensajes;
     
-    ProtocoloServer2 protocolo;
+    public ProtocoloServer2 protocolo;
     PrintWriter out;
     BufferedReader in;
     
@@ -90,9 +90,13 @@ public class MultiServerThread3 extends Thread {
         }
     }
     
-    public void mandar_salida(String salida){
+    public void mandar_salida(String salida) throws InterruptedException{
         System.out.println("SERVER SALIDA PROTOCOLO: " +salida);
         VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER SALIDA PROTOCOLO: " +salida + "\n");
+        out.println(salida);          
+    }
+    
+    public void mandar_salida_foto(String salida){
         out.println(salida);  
     }
     
@@ -101,39 +105,62 @@ public class MultiServerThread3 extends Thread {
         return check;
     }
     
-    public void mandar_al_cliente_destino_nuevo_mensaje(String salida) throws SQLException{
+    public void mandar_al_cliente_destino_nuevo_mensaje(String salida) throws SQLException, InterruptedException{
         //1-Acceder a esa hebra y mandar el mensaje
         this.multiServer.acceder_a_hebra_y_mandar_mensaje(this.usuario_destino, salida);
         //2-Cambiar el booleano enviado de la bd
         this.controladorMensajes.change_boolean_send(this.usuario, this.usuario_destino,this.fechahora_men_enviado);
     }
     
-    public void mandar_al_cliente_origen_mensaje_bien_procesado(String salida){
+    public void mandar_al_cliente_origen_mensaje_bien_procesado(String salida) throws InterruptedException{
         boolean check = this.multiServer.buscar_en_hebras_conectadas(this.usuario_destino);
         if(check){
             this.multiServer.acceder_a_hebra_y_mandar_mensaje(this.usuario_destino, salida);
         }
     }
     
-    public void obtener_paquetes_foto(String login) throws SQLException, FileNotFoundException, IOException{     
+    public void obtener_paquetes_foto(String login) throws SQLException, FileNotFoundException, IOException, InterruptedException{     
         //1-Llamar al controlador para traerme la ruta de la foto
         String rutaFoto = this.controladorUsuario.obtenerRutaFoto(login);
         //2-Extraer bytes con file input stream en un buffer de array de 512bytes
         FileInputStream fileInputStream  = new FileInputStream(rutaFoto);
+        String line = "";
+        int cont = 0;
+        ArrayList<String> arrayLines = new ArrayList<String>();
+//        ArrayList<String> encodeLines = new ArrayList<String>();
         byte buffer[] = new byte[512];
         int off = 0;
         int len = 512;
-        
-        do{
-            fileInputStream.read(buffer, off, len);
-            //3-Encode (PUEDE QUE ME FALLE AQUI)
-            String encodedString = Base64.getEncoder().encodeToString(buffer);
-//            Base64.getEncoder().encode(buffer);            
-            //4-Hacer cadena con el protocolo
-            this.salida_server = this.protocolo.procesarFotoMandarACliente(encodedString, login, len);
-            //5-Manda al cliente
-            this.mandar_salida(this.salida_server);            
-        }while(len!=512);
+        int total = 0;
+         
+//        do{
+            int valor = fileInputStream.read();
+            while(valor!=-1){
+                if (cont > 511) {
+                    arrayLines.add(line);
+                    line = "";
+                    
+                    cont = 0;
+                }
+                line += (char)valor;
+                valor=fileInputStream.read();
+                cont++;
+                total++;
+            }
+            if (cont > 0) {
+                arrayLines.add(line);
+                cont = 0;
+            }
+            
+            
+            for (String s : arrayLines) {
+                ArrayList<String> encodeLines = new ArrayList<String>();
+                encodeLines.add(Base64.getEncoder().encodeToString(s.getBytes()));
+                len = encodeLines.get(0).length();
+                this.salida_server = this.protocolo.procesarFotoMandarACliente(encodeLines, login, len,total);
+                this.mandar_salida_foto(this.salida_server); 
+            }
+          
         
         //3-Mandar al cliente que ya se ha terminado la cadena
         this.salida_server = this.protocolo.procesarSalidaNotificarFinFoto(login);

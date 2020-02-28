@@ -68,7 +68,8 @@ public class ProtocoloCliente2 {
         
         
         if(entrada.contains("#SERVER#CHAT#") && !entrada.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
-            String salida = this.procesarMensajeNuevo(entrada,conexion.array_mensajes_usuario);
+            String salida = this.procesarMensajeNuevo(entrada,conexion.array_mensajes_usuario);            
+            conexion.vchats.nuevo_mensaje("@noelia --- CONNECTED");
             this.conexion.mandarSalida(salida);
         }           
         conexion.contador--;
@@ -185,7 +186,7 @@ public class ProtocoloCliente2 {
     }
     
     public void procesarConversacion_Mensajes(String salida_server, ArrayList <MensajesMapeo> mensajes, int num_men){
-        
+//        if(!salida_server.equals(null) && !salida_server.equals(""))
         int comprobacion = salida_server.indexOf("#SERVER#MSGS#");
         if(comprobacion != -1){
             comprobacion+=13;
@@ -306,6 +307,7 @@ public class ProtocoloCliente2 {
                 mens.setSend(true);
                 
                 mensajes.get(i).mensajes_array.add(mens);
+                this.conexion.amigo = login_usuario_del_mensaje;
             }
         }
         
@@ -373,6 +375,17 @@ public class ProtocoloCliente2 {
             
         }
         
+////        if(entrada.contains("#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#")){
+////            String[] parts = entrada.split("#");        
+////            String user = parts[4];
+////            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#PHOTO_RECEIVED#"+user;
+////        }
+        return theOutput;
+    }
+    
+    public String procesarFotoUltimoMensaje (String entrada){
+        String theOutput = "";
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         if(entrada.contains("#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#")){
             String[] parts = entrada.split("#");        
             String user = parts[4];

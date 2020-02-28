@@ -64,10 +64,6 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
     
     
     public void ordenar(){
-        System.out.println("ORDENAR LOS MENSAJES");
-        for (MensajesMapeo m : this.mensajes_array) {
-            System.out.println("Message Date: " + m.getDatetime());
-        }
         for (int i = 0; i < this.mensajes_array.size(); i++) {
             for (int j = 0; j < this.mensajes_array.size(); j++) {
                 Timestamp.valueOf(this.mensajes_array.get(i).getDatetime()).getTime();
@@ -78,24 +74,6 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
                 }
             }
         }
-        System.out.println("ORDENADOS");
-        for (MensajesMapeo m : this.mensajes_array) {
-            System.out.println("Message Date: " + m.getDatetime());
-        }
-//        Collections.sort(this.mensajes_array, (MensajesMapeo m1, MensajesMapeo m2) -> {
-//            Timestamp f1 = Timestamp.valueOf(m1.getDatetime());
-//            long fecha1 = f1.getTime();
-//            
-//            Timestamp f2 = Timestamp.valueOf(m1.getDatetime());
-//            long fecha2 = f2.getTime();
-//            
-//            if(fecha1<fecha2){
-//                return 1;
-//            }else{
-//                return -1;
-//            }
-//            
-//        });
     }
     
 }
