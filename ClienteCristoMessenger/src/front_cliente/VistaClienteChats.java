@@ -440,12 +440,18 @@ public class VistaClienteChats extends javax.swing.JFrame {
 //        if (amigo.equals(this.friend_mess)) {
 //            this.text_area.setText(this.text_area.getText() + this.friend_mess + "-->" + amigos_del_usuario_mensajes.get(this.pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getDatetime() + "\n");
 //        }
-        if(this.amigos_del_usuario_mensajes.get(pos_amigo).getId_user().equals(this.label_amigo.getText())){
+        
+        System.out.println("VISTA");
+        System.out.println(" U1 : " + this.amigos_del_usuario_mensajes.get(pos_amigo).getId_user());
+        System.out.println(" U2 : " + amigo);
+        if(this.amigos_del_usuario_mensajes.get(pos_amigo).getId_user().contains(amigo)){
+            System.out.println("VISTA ENTRA");
             this.text_area.setText("");
             this.amigos_del_usuario_mensajes.get(pos_amigo).ordenar();
             for (int i = 0; i < amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size(); i++) {
                 this.text_area.setText(this.text_area.getText() + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getId_user_orig() + "-->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getDatetime() + "\n");
             }
+            
         }
     }
     

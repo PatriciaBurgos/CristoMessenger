@@ -32,7 +32,7 @@ public class ThreadEstadoAmigos extends Thread{
     public void run() {   
         while(listening){
             try {
-                Thread.sleep(30000);
+                Thread.sleep(15000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(ThreadEstadoAmigos.class.getName()).log(Level.SEVERE, null, ex);
             }

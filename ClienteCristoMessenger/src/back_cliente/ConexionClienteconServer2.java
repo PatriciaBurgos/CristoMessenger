@@ -323,12 +323,14 @@ public class ConexionClienteconServer2 {
         contador++;
         if(!fromServer.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
             //RECIVO DEL SERVIDOR
-            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
-            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+//            System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+//            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
             //Guardo el mensaje y hago la cadena para enviarla al server
             protocolo.procesarEntradaServer(fromServer);
+//            System.out.println("DM USUARIO: "+ this.array_mensajes_usuario.get(0).getId_user());
+//            System.out.println("DEBUG  2: " + this.array_mensajes_usuario.get(0).mensajes_array.size());
             
-            
+//            
 
         }else{
             System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
@@ -338,21 +340,60 @@ public class ConexionClienteconServer2 {
         notifyAll();
     }
     
+//    synchronized public void comprobar_estados() throws IOException, InterruptedException{
+//        while(contador == 0){
+//            wait();
+//        }
+//        contador++;
+//        String estado;
+//        for(int i= 0; i<this.array_mensajes_usuario.size();i++){
+//            fromUser = this.protocolo.procesarEstadoUsuario_enviarServer(this.usuario,this.array_mensajes_usuario.get(i));
+//            //ENVIO AL SERVIDOR
+//            if (!fromUser.equals("")) {
+//                System.out.println("CLIENT TO SERVER: " + fromUser);
+//                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+//                out.println(fromUser); //Envia por el socket            
+//            }
+//            
+//            //RECIBO DEL SERVIDOR
+//            do{
+//                if(!(fromServer = in.readLine()).equals("")){
+//                    System.out.println("CLIENT RECEIVE TO SERVER: " + fromServer);
+//                    VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + fromServer+ "\n");
+//
+//                    if(fromServer.contains("#STATUS#")){                    
+//                        estado = protocolo.procesarEstadoUsuario(fromServer);   
+//                        this.array_mensajes_usuario.get(i).setId_user(estado);
+//                    }else{ //AÑADIR EL MENSAJE AL ARRAY Y ACTUALIZAR VENTANA
+//                        this.recibo_mensaje();
+//                    }
+//                }
+//            }while(fromServer.equals(""));
+//        }    
+//        VistaClienteChats.actualizar_estados_vista();
+//        contador--;
+//        notifyAll();
+//    }
+    
     synchronized public void comprobar_estados() throws IOException, InterruptedException{
         while(contador == 0){
             wait();
         }
         contador++;
         String estado;
-        for(int i= 0; i<this.array_mensajes_usuario.size();i++){
-            fromUser = this.protocolo.procesarEstadoUsuario_enviarServer(this.usuario,this.array_mensajes_usuario.get(i));
-            //ENVIO AL SERVIDOR
-            if (!fromUser.equals("")) {
-                System.out.println("CLIENT TO SERVER: " + fromUser);
-                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
-                out.println(fromUser); //Envia por el socket            
-            }
+        int longitud = 0;
+        boolean mandar = true;
+        while(longitud != this.array_mensajes_usuario.size()){
+            if(mandar){
+                fromUser = this.protocolo.procesarEstadoUsuario_enviarServer(this.usuario,this.array_mensajes_usuario.get(longitud));
             
+                //ENVIO AL SERVIDOR
+                if (!fromUser.equals("")) {
+                    System.out.println("CLIENT TO SERVER: " + fromUser);
+                    VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT TO SERVER: " + fromUser+ "\n");
+                    out.println(fromUser); //Envia por el socket            
+                }
+            }
             //RECIBO DEL SERVIDOR
             do{
                 if(!(fromServer = in.readLine()).equals("")){
@@ -361,9 +402,12 @@ public class ConexionClienteconServer2 {
 
                     if(fromServer.contains("#STATUS#")){                    
                         estado = protocolo.procesarEstadoUsuario(fromServer);   
-                        this.array_mensajes_usuario.get(i).setId_user(estado);
+                        this.array_mensajes_usuario.get(longitud).setId_user(estado);
+                        longitud++;
+                        mandar=true;
                     }else{ //AÑADIR EL MENSAJE AL ARRAY Y ACTUALIZAR VENTANA
                         this.recibo_mensaje();
+                        mandar=false;
                     }
                 }
             }while(fromServer.equals(""));

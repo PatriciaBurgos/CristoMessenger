@@ -68,8 +68,8 @@ public class ProtocoloCliente2 {
         
         
         if(entrada.contains("#SERVER#CHAT#") && !entrada.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
-            String salida = this.procesarMensajeNuevo(entrada,conexion.array_mensajes_usuario);            
-            conexion.vchats.nuevo_mensaje("@noelia --- CONNECTED");
+            String salida = this.procesarMensajeNuevo(entrada,conexion);            
+            conexion.vchats.nuevo_mensaje(conexion.amigo);
             this.conexion.mandarSalida(salida);
         }           
         conexion.contador--;
@@ -285,8 +285,8 @@ public class ProtocoloCliente2 {
         return theOutput;
     }
     
-    public String procesarMensajeNuevo(String entrada,ArrayList <AmigosDeUnUsuario_Mensajes> mensajes){
-        String theOutput = null;
+    public String procesarMensajeNuevo(String entrada, ConexionClienteconServer2 conex){
+        String theOutput = "";
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String[] parts = entrada.split("#");
         
@@ -295,9 +295,13 @@ public class ProtocoloCliente2 {
         String mensaje = parts[6];
         String fechahora =parts[7];
         
-        for(int i = 0; i<mensajes.size();i++){
-            if(mensajes.get(i).getId_user()==login_usuario_del_mensaje){
-                mensajes.get(i).num_men_recibidos++;
+        System.out.println("DM login_usuario_del_mensaje :"+ login_usuario_del_mensaje);
+        
+        
+        for(int i = 0; i<conex.array_mensajes_usuario.size();i++){
+//            System.out.println("DM mensajes.get(i).getId_user(): " + conex.array_mensajes_usuario.get(i).getId_user());
+            if(conex.array_mensajes_usuario.get(i).getId_user().contains(login_usuario_del_mensaje)){
+                conex.array_mensajes_usuario.get(i).num_men_recibidos++;
                 
                 MensajesMapeo mens = new MensajesMapeo();
                 mens.setId_user_orig(login_usuario_del_mensaje);
@@ -306,7 +310,8 @@ public class ProtocoloCliente2 {
                 mens.setDateTime(fechahora);
                 mens.setSend(true);
                 
-                mensajes.get(i).mensajes_array.add(mens);
+                conex.array_mensajes_usuario.get(i).mensajes_array.add(mens);
+//                System.out.println("DEBUG  1: " + conex.array_mensajes_usuario.get(i).mensajes_array.size());
                 this.conexion.amigo = login_usuario_del_mensaje;
             }
         }
