@@ -24,6 +24,7 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
     int num_amigos;
     String ultima_fecha_buscada;
     int num_men_recibidos;
+    String ruta_img;
     
     public AmigosDeUnUsuario_Mensajes(){
         mensajes_array=new ArrayList();
@@ -61,6 +62,15 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
         this.nombreCompleto = nombreCompleto;
     }
 
+    public String getRuta_img() {
+        return ruta_img;
+    }
+
+    public void setRuta_img(String ruta_img) {
+        this.ruta_img = ruta_img;
+    }
+
+    
     
     
     public void ordenar(){
