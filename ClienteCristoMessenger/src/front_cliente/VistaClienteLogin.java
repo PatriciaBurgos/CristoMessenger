@@ -92,7 +92,7 @@ public class VistaClienteLogin extends javax.swing.JFrame {
 
         jLabel2.setText("PUERTO:");
 
-        textIP.setText("83.50.219.174");
+        textIP.setText("83.50.217.63");
         textIP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 textIPActionPerformed(evt);
@@ -183,7 +183,6 @@ public class VistaClienteLogin extends javax.swing.JFrame {
                 JOptionPane.ERROR_MESSAGE);
         } else{
             System.out.println("CLIENT: conectando....");
-//            VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT: CONECTANDO..." + "\n");
         
             ConexionClienteconServer2 cliente_conexion;
             try {
@@ -194,7 +193,6 @@ public class VistaClienteLogin extends javax.swing.JFrame {
             
                 if(comprobar_error != -1){
                     System.out.println("CLIENT: MENSAJE DE ERROR BAD LOGIN");
-    //                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT: MENSAJE DE ERROR BAD LOGIN" + "\n");
 
                     JOptionPane.showMessageDialog(null, "Acceso denegado:\n"
                         + "Por favor ingrese un usuario y/o contraseña correctos", "Acceso denegado",
@@ -202,7 +200,6 @@ public class VistaClienteLogin extends javax.swing.JFrame {
                 }else{ //COMPROBAR QUE ESTA BIEN
 
                     System.out.println("CLIENT: USUARIO CORRECTO");
-     //               VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT: USUARIO CORRECTO" + "\n");
 
                     JOptionPane.showMessageDialog(null, "Bienvenido\n"
                         + "Has ingresado satisfactoriamente al sistema",   "Mensaje de bienvenida",

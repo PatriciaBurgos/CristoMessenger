@@ -206,4 +206,6 @@ public class ModeloUsuario extends BDConnector{
         return ruta;
     }
     
+    
+    
 }

@@ -79,16 +79,11 @@ public class BDConnector {
     }
     
     public void conectar_bd() throws SQLException{
-        conn = DriverManager.getConnection(url, user, password);
-//        System.out.println("SERVER: CONEXION CON LA BASE DE DATOS");
-//        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: CONEXION CON LA BASE DE DATOS" + "\n");
-                
+        conn = DriverManager.getConnection(url, user, password);       
     }
     
     public void desconectar_bd() throws SQLException{
         conn.close();
-//        System.out.println("SERVER: DESCONEXION CON LA BASE DE DATOS");
-//        VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: DESCONEXION CON LA BASE DE DATOS" + "\n");       
     }
     
     public void set_conn (Connection conn) {

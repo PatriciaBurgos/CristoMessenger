@@ -100,7 +100,4 @@ public class UsuariosMapeo {
         return "UsuariosMapeo{" + "id_user=" + id_user + ", name=" + name + ", surname1=" + surname1 + ", surname2=" + surname2 + "}";
     }
 
-
-
-
 }

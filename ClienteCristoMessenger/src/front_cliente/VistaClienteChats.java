@@ -81,7 +81,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
         listModel = new DefaultListModel();
         this.list_friends.setModel(listModel);
         list_friends.setCellRenderer(new ListaRender());
-        
+        this.label_anterior="";
 
     }
     
@@ -197,6 +197,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
         });
         jScrollPane3.setViewportView(list_friends);
 
+        text_area.setEditable(false);
         text_area.setColumns(20);
         text_area.setRows(5);
         scroll.setViewportView(text_area);
@@ -258,9 +259,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
                             .addComponent(label_imagen_user, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(label_usuario_activo))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panel_chatLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(label_imagen_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(label_imagen_amigo, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_chatLayout.createSequentialGroup()
                         .addComponent(miImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -315,7 +314,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pestañas, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                .addComponent(pestañas)
                 .addContainerGap())
         );
 
@@ -325,10 +324,11 @@ public class VistaClienteChats extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarActionPerformed
-        if(!this.label_amigo.equals("")){
+        if(!this.label_amigo.getText().equals("")){
             try {
                 try {
-                    this.cargar_mensajes_anteriores(label_amigo.getText(), pos_amigo);
+                    String id = this.cambiar_nombre_a_id();
+                    this.get_messages_friend(id, pos_amigo);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -336,55 +336,77 @@ public class VistaClienteChats extends javax.swing.JFrame {
                 Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
-            System.out.println("No hay seleccionado nadie");
+            JOptionPane.showMessageDialog(null, "Selecciona un amigo", "Seleccionar amigo",
+                        JOptionPane.INFORMATION_MESSAGE);        
         }
     }//GEN-LAST:event_cargarActionPerformed
 
     private void cargarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cargarMouseClicked
-        //        this.seleccionar_amigo(evt);
-        //        try {
-            //            this.cargar_mensajes_anteriores(label_amigo.getText(),pos_amigo);
-            //        } catch (IOException ex) {
-            //            Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
-            //        }
+        
     }//GEN-LAST:event_cargarMouseClicked
 
     private void list_friendsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_friendsMouseClicked
+        this.labelAnterior();
         this.seleccionar_amigo(evt);
-        try {
-            this.fotoAmigo();
-            this.get_messages_friend(label_amigo.getText(), pos_amigo);
-            //this.conexionCliente.esperar_mensaje();
-        } catch (IOException ex) {
-            Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+        if(!this.label_amigo.getText().equals(this.label_anterior)){
+            try {
+                
+                this.fotoAmigo(); 
+                boolean check = this.comprobarMensajesExistentes();
+                if(check==false){
+                    String id = this.cambiar_nombre_a_id();
+                    this.get_messages_friend(id, pos_amigo);
+                    if(this.label_amigo.getText().contains("---")){
+                        this.label_amigo.setText(this.cambiar_id_a_nombre());
+                    }
+                }else{
+                    if(this.label_amigo.getText().contains("---")){
+                        String nuevo = this.cambiar_id_a_nombre();
+                        this.label_amigo.setText(nuevo);
+                    }
+                    this.cargarMensajesVista();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){
+                if(this.label_amigo.getText().equals(amigos_del_usuario_mensajes.get(i).getId_user())){
+                    this.label_amigo.setText(amigos_del_usuario_mensajes.get(i).getNombreCompleto());
+                }
+            }
         }
     }//GEN-LAST:event_list_friendsMouseClicked
 
     private void boton_envio_mensajesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_envio_mensajesActionPerformed
-        String texto;
+        if(this.label_amigo.getText().equals("")){
+            JOptionPane.showMessageDialog(null, "Selecciona un amigo", "Seleccionar amigo",
+                        JOptionPane.INFORMATION_MESSAGE);
+        }else{
+           
+            String texto;
 
-        texto = this.text.getText();
-
-        if (texto.length() == 1000) {
-            JOptionPane.showMessageDialog(null, "Mensaje demasiado largo", "Mensaje de error",
-                JOptionPane.ERROR_MESSAGE);
-        } else {
-            try {
-                this.enviar_mensaje(texto, pos_amigo);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+            texto = this.text.getText();
+            if(!"".equals(texto)){
+                if (texto.length() >= 1024) {
+                    JOptionPane.showMessageDialog(null, "Mensaje demasiado largo", "Mensaje de error",
+                        JOptionPane.ERROR_MESSAGE);
+                } else {
+                    try {
+                        this.enviar_mensaje(texto, pos_amigo);
+                        this.text.setText("");
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(VistaClienteChats.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
-
-        //this.text_area.append(this.label_usuario_activo.getText()+": "+texto+"\n");
-        this.text.setText("");
     }//GEN-LAST:event_boton_envio_mensajesActionPerformed
 
     public void seleccionar_amigo(java.awt.event.MouseEvent evt) {
         JList theList = (JList) evt.getSource();
-        //if (evt.getClickCount() == 2) {
         int index = theList.locationToIndex(evt.getPoint());
         if (index >= 0) {
             Object o = theList.getModel().getElementAt(index);
@@ -392,11 +414,55 @@ public class VistaClienteChats extends javax.swing.JFrame {
             label_amigo.setText(o.toString());
             friend_mess = o.toString();
             pos_amigo = index;
-            
-            //ME TENGO QUE TRAER LA FOTO AQUI
-            
         }
-        //  }
+    }
+    
+    public boolean labelAnterior(){
+        boolean antes = true; //Antes no estaba en el label
+        if(!this.label_amigo.getText().equals("")){
+            if(this.label_anterior.equals("")){
+                label_anterior=this.label_amigo.getText();
+            }else{
+                if(this.label_amigo.getText().contains("---")){
+                    for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){
+                        if(this.label_amigo.getText().equals(amigos_del_usuario_mensajes.get(i).getId_user())){
+                            this.label_anterior=amigos_del_usuario_mensajes.get(i).getId_user();
+                            antes = false;
+                            //this.label_amigo.setText(amigos_del_usuario_mensajes.get(i).getNombreCompleto());
+                        }
+                    }
+                }else{
+                    for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){
+                        if(this.label_amigo.getText().equals(amigos_del_usuario_mensajes.get(i).getNombreCompleto())){
+                            this.label_anterior=amigos_del_usuario_mensajes.get(i).getId_user();
+                            antes = false;
+                            //this.label_amigo.setText(amigos_del_usuario_mensajes.get(i).getNombreCompleto());
+
+                        }
+                    }
+                }  
+            }
+        }
+        return antes;
+    }
+    
+    public boolean comprobarMensajesExistentes(){
+        boolean check=false;
+        for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){
+            if(this.label_amigo.getText().equals(amigos_del_usuario_mensajes.get(i).getId_user())){
+                if(amigos_del_usuario_mensajes.get(i).getNombreCompleto()!=""){
+                    check=true;
+                }                
+            }
+        }
+        return check;
+    }
+    
+    public void cargarMensajesVista(){
+        this.text_area.setText("");
+        for (int i = 0; i < amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size(); i++) {
+            this.text_area.setText(text_area.getText() + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getId_user_orig() + "-->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getDatetime() + "\n");
+        }
     }
 
     public void getFriends(ArrayList amigos) {
@@ -462,21 +528,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
 //            vchats.label_amigo.setText(nombreCompleto);
 //        }
     }
-
-    public void cargar_mensajes_anteriores(String user_dest, int pos) throws IOException, InterruptedException {
-
-        //Tengo que cambiar lo de los amigos_del_usuario_mensajes
-        this.conexionCliente.conectar_con_server_leer_mensajes(user_dest, pos);
-
-        this.text_area.setText("");
-        this.amigos_del_usuario_mensajes.get(pos).ordenar();
-        for (int i = 0; i < amigos_del_usuario_mensajes.get(pos).mensajes_array.size(); i++) {
-            this.text_area.setText(this.text_area.getText() + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getId_user_orig() + "-->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(i).getDatetime() + "\n");
-        }
-
-        // this.conexionCliente.conectar_con_server_obtener_datos(user_dest);
-    }
-
+    
     public void enviar_mensaje(String texto, int pos) throws InterruptedException {
         this.conexionCliente.conectar_con_server_enviar_mensajes(texto, this.user_act, this.friend_mess);
         this.guardar_mensaje_memoria_local(texto, pos);
@@ -485,20 +537,13 @@ public class VistaClienteChats extends javax.swing.JFrame {
 
     public void guardar_mensaje_memoria_local(String texto, int pos) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        //for(int i = 0; i<this.amigos_del_usuario_mensajes.size();i++){
-        // if(this.amigos_del_usuario_mensajes.get(pos).getId_user() == this.friend_mess){
         MensajesMapeo mess = new MensajesMapeo();
         mess.setId_user_orig(user_act);
         mess.setId_user_dest(friend_mess);
         mess.setText(texto);
         mess.setDateTime(sdf.format(timestamp));
         amigos_del_usuario_mensajes.get(pos).mensajes_array.add(mess);
-        //this.amigos_del_usuario_mensajes.get(pos).setNum_men_recibidos(amigos_del_usuario_mensajes.get(pos).getNum_men_recibidos()+1);
-
         this.text_area.setText(this.text_area.getText() + this.user_act + "-->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(amigos_del_usuario_mensajes.get(pos).mensajes_array.size() - 1).getText() + "--->" + amigos_del_usuario_mensajes.get(pos).mensajes_array.get(amigos_del_usuario_mensajes.get(pos).mensajes_array.size() - 1).getDatetime() + "\n");
-
-        //}
-        //}
     }
 
     public static void actualizar_estados_vista() {
@@ -508,26 +553,15 @@ public class VistaClienteChats extends javax.swing.JFrame {
             listModel2.addElement(amigos_del_usuario_mensajes.get(i).getId_user());
         }
         VistaClienteChats.list_friends.setModel(listModel2);
-        //HACER LA SELECCION
-
     }
 
     public void nuevo_mensaje(String amigo) {
-//        if (amigo.equals(this.friend_mess)) {
-//            this.text_area.setText(this.text_area.getText() + this.friend_mess + "-->" + amigos_del_usuario_mensajes.get(this.pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size() - 1).getDatetime() + "\n");
-//        }
-        
-        System.out.println("VISTA");
-        System.out.println(" U1 : " + this.amigos_del_usuario_mensajes.get(pos_amigo).getId_user());
-        System.out.println(" U2 : " + amigo);
         if(this.amigos_del_usuario_mensajes.get(pos_amigo).getId_user().contains(amigo)){
-            System.out.println("VISTA ENTRA");
             this.text_area.setText("");
             this.amigos_del_usuario_mensajes.get(pos_amigo).ordenar();
             for (int i = 0; i < amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.size(); i++) {
                 this.text_area.setText(this.text_area.getText() + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getId_user_orig() + "-->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getText() + "--->" + amigos_del_usuario_mensajes.get(pos_amigo).mensajes_array.get(i).getDatetime() + "\n");
-            }
-            
+            }   
         }
     }
     
@@ -549,10 +583,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
             rutaUser = this.traeFoto(amigo);
             
             for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){
-                System.out.println("amigo: " + amigo);
-                System.out.println("id : " + this.amigos_del_usuario_mensajes.get(i).getId_user());
                 if(this.amigos_del_usuario_mensajes.get(i).getId_user().contains(amigo)){
-                    System.out.println("i : " + i);
                     amigos_del_usuario_mensajes.get(i).setRuta_img(rutaUser);
                 }
             }
@@ -567,6 +598,29 @@ public class VistaClienteChats extends javax.swing.JFrame {
         this.repaint();
     }
     
+    public String cambiar_nombre_a_id(){
+        String id=this.label_amigo.getText();
+        if(!this.label_amigo.getText().contains("---")){
+            for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){                
+                if(this.amigos_del_usuario_mensajes.get(i).getNombreCompleto().equals(this.label_amigo.getText())){                    
+                    id=this.amigos_del_usuario_mensajes.get(i).getId_user();
+                }
+            }
+        }
+        return id;
+    }
+    
+    public String cambiar_id_a_nombre(){
+        String nombre=this.label_amigo.getText();
+        if(this.label_amigo.getText().contains("---")){
+            for(int i = 0; i<amigos_del_usuario_mensajes.size();i++){                
+                if(this.amigos_del_usuario_mensajes.get(i).getId_user().equals(this.label_amigo.getText())){                    
+                    nombre=this.amigos_del_usuario_mensajes.get(i).getNombreCompleto();
+                }
+            }
+        }
+        return nombre;
+    }
     
 
     /**
@@ -630,7 +684,7 @@ public class VistaClienteChats extends javax.swing.JFrame {
     private javax.swing.JTabbedPane pestañas;
     private javax.swing.JScrollPane scroll;
     private javax.swing.JTextArea text;
-    private javax.swing.JTextArea text_area;
+    public javax.swing.JTextArea text_area;
     // End of variables declaration//GEN-END:variables
 
     /*Registro*/
@@ -652,4 +706,5 @@ public class VistaClienteChats extends javax.swing.JFrame {
     static ArrayList<AmigosDeUnUsuario_Mensajes> amigos_del_usuario_mensajes;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     int pos_amigo;
+    String label_anterior;
 }

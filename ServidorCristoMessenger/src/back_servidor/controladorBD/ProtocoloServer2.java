@@ -46,6 +46,9 @@ public class ProtocoloServer2 {
             if(entrada_cliente.contains("#CLIENT#LOGIN#")){
                 salida = this.procesarEntradaLogin();
                 hebra.mandar_salida(salida);
+                if(salida.contains("#SERVER#ERROR#BAD_LOGIN")){
+                    hebra.desconectar();
+                }
             }
 
 
@@ -124,8 +127,7 @@ public class ProtocoloServer2 {
 
                 }else if(this.entrada_cliente.contains("#RECEIVED_MESSAGE#")){ 
                     //Este mensaje es del cliente destino
-                    //1- Cambiar booleano read de la bd
-                    
+                    //1- Cambiar booleano read de la bd                    
                     this.salida = this.procesarSalidaNotificarMensajeClienteOrigen();
                     
                     //2- Mandar cadena al cliente origen 
@@ -163,20 +165,11 @@ public class ProtocoloServer2 {
                 
             }
 
-            //EL CLIENTE ME VA A MANDAR OTRO CODIGO DISTINTO CON LA FOTO
-
-
-
-
-
-
-
         //ERROR EN EL PRINCIPIO DE LA CADENA
         }else{
             salida = procesarErrorPrincipioCadena(); 
             this.hebra.mandar_salida(salida);
         }
-        
         
         contador--;
         notifyAll();
@@ -193,6 +186,7 @@ public class ProtocoloServer2 {
         String theOutput = "";
         String login = "";
         String contraseña;
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         
         //Ajusto la cadena para quedarme con el usuario
         int comprob_entrada = entrada_cliente.indexOf("#CLIENT#LOGIN#");
@@ -212,7 +206,6 @@ public class ProtocoloServer2 {
             boolean check = hebra.controladorUsuario.check_user_login(login, contraseña);            
             
             //Salida
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             if(check == false){
                 theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#ERROR#BAD_LOGIN";
             }else{
@@ -245,14 +238,25 @@ public class ProtocoloServer2 {
                 }
             }        
         } else{
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            
             theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#ERROR#BAD_LOGIN";
             System.out.println("SERVER: Error de cadena (ALERTA HACKER");
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: Error de cadena (ALERTA HACKER)" + "\n");
         }
         
-        usuario = login;
+        this.hebra.usuario = login;
+        
+        //busco a ver si hay una hebra con ese nombre de usuario
+        boolean check = this.hebra.multiServer.buscar_en_hebras_conectadas(login);
+        if(check == true){
+            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#SERVER#ERROR#BAD_LOGIN";
+        }
+        
+        usuario=login;
         this.hebra.setName(usuario);
+        
+        this.conectar();
+        
         return theOutput;
     }
     
@@ -468,4 +472,11 @@ public class ProtocoloServer2 {
         return theOutput;
     }
     
+    public void desconectar() throws SQLException{
+        hebra.controladorUsuario.cambiarestado(hebra.usuario, false);
+    }
+    
+    public void conectar() throws SQLException{
+        hebra.controladorUsuario.cambiarestado(hebra.usuario, true);
+    }
 }

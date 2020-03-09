@@ -45,7 +45,7 @@ public class MultiServer {
         }
     }   
     
-    public void desconectar() throws InterruptedException{
+    public void desconectar() throws InterruptedException, SQLException{
         System.out.println("SERVER: SE VA A DESCONECTAR");
         VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: SE VA A DESCONECTAR" + "\n");
         

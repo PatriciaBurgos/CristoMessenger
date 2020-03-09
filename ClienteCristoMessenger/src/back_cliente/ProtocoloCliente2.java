@@ -34,39 +34,6 @@ public class ProtocoloCliente2 {
         }
         conexion.contador++;
         
-//        if(entrada.contains("#SERVER#LOGIN_CORRECT")){
-//            this.procesarSalidaLogin(entrada);
-//        }
-//        int num = this.contarCaracteres(entrada, '#');
-//        if(entrada.contains("#SERVER#MSGS#") && num == 7){
-//            this.procesarConversacion_Numero(entrada, conexion.num_men_totales,conexion.num_men_dia);
-//
-//        }else{
-//            for(int i=0; i<conexion.num_men_dia; i++){
-//                //Si me envía algún mensaje
-//                System.out.println("CLIENT RECEIVE TO SERVER: " + entrada);
-//                VistaClienteChats.TextAreaDebug.setText(VistaClienteChats.TextAreaDebug.getText()+ "CLIENT RECEIVE TO SERVER: " + entrada+ "\n");
-//                this.procesarConversacion_Mensajes(entrada, conexion.array_mensajes_usuario.get(conexion.pos).mensajes_array, conexion.num_men_totales);   
-//                conexion.array_mensajes_usuario.get(conexion.pos).num_men_recibidos++;
-//            }            
-//        }
-//        if(entrada.contains("#SERVER#ALLDATA_USER#")){
-//            this.procesarDatosUsuario(entrada);
-//        }
-//        if(entrada.contains("#SERVER#STATUS#")){
-//            procesarEstadoUsuario(entrada);   
-//            conexion.array_mensajes_usuario.get(i).setId_user(estado);
-//        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         if(entrada.contains("#SERVER#CHAT#") && !entrada.contains("#MESSAGE_SUCCESFULLY_PROCESSED#")){
             String salida = this.procesarMensajeNuevo(entrada,conexion);            
             conexion.vchats.nuevo_mensaje(conexion.amigo);
@@ -150,11 +117,12 @@ public class ProtocoloCliente2 {
     
     public String procesarPedirConversacion(String user,String user_friend, String auxDate1){
         String theOutput = "";
+        String amigo;
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
        
         int empi = user_friend.indexOf(" ---");
-        String amigo = user_friend.substring(0, empi);
-        
+        amigo = user_friend.substring(0, empi);
+            
         theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#MSGS#"+user+"#"+amigo+"#"+auxDate1;
                
         
@@ -186,7 +154,6 @@ public class ProtocoloCliente2 {
     }
     
     public void procesarConversacion_Mensajes(String salida_server, ArrayList <MensajesMapeo> mensajes, int num_men){
-//        if(!salida_server.equals(null) && !salida_server.equals(""))
         int comprobacion = salida_server.indexOf("#SERVER#MSGS#");
         if(comprobacion != -1){
             comprobacion+=13;
@@ -209,7 +176,13 @@ public class ProtocoloCliente2 {
                 i++;
                 men.setText(texto);
                 
-                mensajes.add(men);
+                boolean repetido = false;
+                for(int j = 0; j<mensajes.size();j++){
+                    repetido=this.conexion.array_mensajes_usuario.get(this.conexion.pos).comprobar_repetidos(men);
+                }
+                if(repetido==false){
+                    mensajes.add(men);
+                }
             }            
             
         }else{
@@ -376,15 +349,8 @@ public class ProtocoloCliente2 {
             
             for (char c : s.toCharArray()) {
                 ficheroSalida.write(c);//char 
-            }
-            
-        }
-        
-////        if(entrada.contains("#SERVER#ENDING_MULTIMEDIA_TRANSMISSION#")){
-////            String[] parts = entrada.split("#");        
-////            String user = parts[4];
-////            theOutput = "PROTOCOLCRISTOMESSENGER1.0#"+sdf.format(timestamp)+"#CLIENT#PHOTO_RECEIVED#"+user;
-////        }
+            }            
+        }        
         return theOutput;
     }
     

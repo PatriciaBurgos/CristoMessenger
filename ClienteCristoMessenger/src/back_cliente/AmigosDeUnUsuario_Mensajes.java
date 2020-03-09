@@ -28,6 +28,7 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
     
     public AmigosDeUnUsuario_Mensajes(){
         mensajes_array=new ArrayList();
+        nombreCompleto="";
     }
 
     public int getNum_amigos() {
@@ -70,9 +71,6 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
         this.ruta_img = ruta_img;
     }
 
-    
-    
-    
     public void ordenar(){
         for (int i = 0; i < this.mensajes_array.size(); i++) {
             for (int j = 0; j < this.mensajes_array.size(); j++) {
@@ -84,6 +82,20 @@ public class AmigosDeUnUsuario_Mensajes extends UsuariosMapeo {
                 }
             }
         }
+    }
+    
+    public boolean comprobar_repetidos(MensajesMapeo men){
+        boolean repetido=false;
+        for(int i = 0; i<this.mensajes_array.size();i++){
+            if(mensajes_array.get(i).getId_user_orig().equals(men.getId_user_orig())){
+                if(mensajes_array.get(i).getId_user_dest().equals(men.getId_user_dest())){
+                    if(mensajes_array.get(i).getDatetime().equals(men.getDatetime())){
+                        repetido = true;
+                    }
+                }
+            }
+        }
+        return repetido;
     }
     
 }

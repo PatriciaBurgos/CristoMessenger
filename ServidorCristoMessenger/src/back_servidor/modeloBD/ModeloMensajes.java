@@ -164,6 +164,7 @@ public class ModeloMensajes extends BDConnector{
     
     public void save_message(String db, String table,String usuario, String amigo,String texto, String fecha) throws SQLException {
         
+        
         this.query_messages_save(usuario, amigo, texto, fecha);
         this.conectar_bd();
         

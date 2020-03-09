@@ -34,7 +34,7 @@ public class ControladorAmigos {
             this.friends_modelo.get_all_friends_model(this.friends_modelo.get_dbname(), this.friends_modelo.getTabladb(), friends, id_orig);
             
         } catch (SQLException ex) {
-            Logger.getLogger(ProtocoloServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProtocoloServer2.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

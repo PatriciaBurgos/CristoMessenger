@@ -30,8 +30,6 @@ public class ControladorUsuario {
     
     //*****CLASS METHODS*****//
     
-    
-    
     public boolean check_user_login (String usuario, String password) {
         boolean check = false;
         
@@ -39,7 +37,7 @@ public class ControladorUsuario {
             check = usuario_modelo.check_user_login(usuario_modelo.get_dbname(), usuario_modelo.getTabladb(),usuario,password,check);
            
         } catch (SQLException ex) {
-            Logger.getLogger(ProtocoloServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProtocoloServer2.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return check;
@@ -51,7 +49,7 @@ public class ControladorUsuario {
             check = usuario_modelo.check_user(usuario_modelo.get_dbname(), usuario_modelo.getTabladb(),usuario,check);
             
         } catch (SQLException ex) {
-            Logger.getLogger(ProtocoloServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProtocoloServer2.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return check;
@@ -70,7 +68,7 @@ public class ControladorUsuario {
             usuario_modelo.get_data_user(usuario_modelo.get_dbname(), usuario_modelo.getTabladb(),user_data);
             
         } catch (SQLException ex) {
-            Logger.getLogger(ProtocoloServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProtocoloServer2.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

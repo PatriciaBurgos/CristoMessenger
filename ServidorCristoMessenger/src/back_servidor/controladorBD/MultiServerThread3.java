@@ -62,13 +62,21 @@ public class MultiServerThread3 extends Thread {
 
     
     @Override
-    public void run() {    
+    public void run() {            
         while(conectar){
             try {
                 //Recivo una cadena del cliente
                 entrada_cliente = in.readLine();
+                entrada_cliente = entrada_cliente.replaceAll("'", "");
+                entrada_cliente = entrada_cliente.replaceAll("\"", "");
             } catch (IOException ex) {
-                Logger.getLogger(MultiServerThread2.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    this.desconectar();
+                } catch (SQLException ex1) {
+                    Logger.getLogger(MultiServerThread3.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+                Logger.getLogger(MultiServerThread3.class.getName()).log(Level.SEVERE, null, ex);
+                
             }
             System.out.println("CLIENT TO SERVER: "+entrada_cliente);
             VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "CLIENT TO SERVER: " +entrada_cliente+ "\n");
@@ -85,6 +93,7 @@ public class MultiServerThread3 extends Thread {
                     Logger.getLogger(MultiServerThread3.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MultiServerThread3.class.getName()).log(Level.SEVERE, null, ex);
+                    
                 }
             }
         }
@@ -119,11 +128,22 @@ public class MultiServerThread3 extends Thread {
         }
     }
     
-    public void obtener_paquetes_foto(String login) throws SQLException, FileNotFoundException, IOException, InterruptedException{     
+    public void obtener_paquetes_foto(String login) throws SQLException, IOException, InterruptedException{  
+        FileInputStream fileInputStream;
         //1-Llamar al controlador para traerme la ruta de la foto
         String rutaFoto = this.controladorUsuario.obtenerRutaFoto(login);
         //2-Extraer bytes con file input stream en un buffer de array de 512bytes
-        FileInputStream fileInputStream  = new FileInputStream(rutaFoto);
+        try{
+            fileInputStream  = new FileInputStream(rutaFoto);
+        }catch(IOException e){
+            System.out.println(e);
+            fileInputStream  = new FileInputStream("data/error.jpg");
+        }
+       
+        if(fileInputStream.equals("")){
+            fileInputStream  = new FileInputStream("data/error.jpg");
+        }
+        
         String line = "";
         int cont = 0;
         ArrayList<String> arrayLines = new ArrayList<String>();
@@ -133,34 +153,32 @@ public class MultiServerThread3 extends Thread {
         int len = 512;
         int total = 0;
          
-//        do{
-            int valor = fileInputStream.read();
-            while(valor!=-1){
-                if (cont > 511) {
-                    arrayLines.add(line);
-                    line = "";
-                    
-                    cont = 0;
-                }
-                line += (char)valor;
-                valor=fileInputStream.read();
-                cont++;
-                total++;
-            }
-            if (cont > 0) {
+        int valor = fileInputStream.read();
+        while(valor!=-1){
+            if (cont > 511) {
                 arrayLines.add(line);
+                line = "";
+
                 cont = 0;
             }
-            
-            
-            for (String s : arrayLines) {
-                ArrayList<String> encodeLines = new ArrayList<String>();
-                encodeLines.add(Base64.getEncoder().encodeToString(s.getBytes()));
-                len = encodeLines.get(0).length();
-                this.salida_server = this.protocolo.procesarFotoMandarACliente(encodeLines, login, len,total);
-                this.mandar_salida_foto(this.salida_server); 
-            }
-          
+            line += (char)valor;
+            valor=fileInputStream.read();
+            cont++;
+            total++;
+        }
+        if (cont > 0) {
+            arrayLines.add(line);
+            cont = 0;
+        }
+
+
+        for (String s : arrayLines) {
+            ArrayList<String> encodeLines = new ArrayList<String>();
+            encodeLines.add(Base64.getEncoder().encodeToString(s.getBytes()));
+            len = encodeLines.get(0).length();
+            this.salida_server = this.protocolo.procesarFotoMandarACliente(encodeLines, login, len,total);
+            this.mandar_salida_foto(this.salida_server); 
+        }          
         
         //3-Mandar al cliente que ya se ha terminado la cadena
         this.salida_server = this.protocolo.procesarSalidaNotificarFinFoto(login);
@@ -168,10 +186,12 @@ public class MultiServerThread3 extends Thread {
         
     }
     
-    public void desconectar (){
+    public void desconectar () throws SQLException{
+        this.protocolo.desconectar();
+        
         System.out.println("SERVER: DESCONECTO HEBRA");
         VistaServer.areaDebugServer.setText(VistaServer.areaDebugServer.getText()+ "SERVER: DESCONECTO HEBRA" + "\n");
-                        
+        this.setName("");
         conectar=false;
     }
     
